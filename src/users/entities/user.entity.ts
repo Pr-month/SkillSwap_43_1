@@ -1,14 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
-enum IGender {
-  MALE = 'male',
-  FEMALE = 'female',
-}
-
-enum IRole {
-  USER = 'user',
-  ADMIN = 'admin',
-}
+import { Role, Gender } from './user.enums';
 
 @Entity()
 export class User {
@@ -36,9 +27,9 @@ export class User {
   city: string;
 
   @Column({
-    enum: IGender,
+    enum: Gender,
   })
-  gender: IGender;
+  gender: Gender;
 
   @Column()
   avatar: string;
@@ -53,9 +44,10 @@ export class User {
   favoriteSkills: string[];
 
   @Column({
-    enum: IRole,
+    enum: Role,
+    default: Role.USER,
   })
-  role: IRole;
+  role: Role;
 
   @Column()
   refreshToken: string;
