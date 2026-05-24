@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSourceOptions } from 'typeorm';
 import { AppController } from './app.controller';
@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 
-type DatabaseType = 'postgres' | 'mongodb'
+type DatabaseType = 'postgres' | 'mongodb';
 
 @Module({
   imports: [
@@ -24,10 +24,10 @@ type DatabaseType = 'postgres' | 'mongodb'
         password: configService.get<string>('DATABASE_PASSWORD'),
         entities: [],
         synchronize: false,
-      })
+      }),
     }),
     AuthModule,
-    UsersModule
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
