@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { AccessTokenGuard } from '../auth/accessToken.guard';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
@@ -6,6 +7,7 @@ describe('UsersController', () => {
   let controller: UsersController;
   const usersService = {
     findAll: jest.fn(),
+    findById: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -17,7 +19,10 @@ describe('UsersController', () => {
           useValue: usersService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AccessTokenGuard)
+      .useValue({ canActivate: jest.fn(() => true) })
+      .compile();
 
     controller = module.get<UsersController>(UsersController);
     jest.clearAllMocks();
@@ -33,5 +38,20 @@ describe('UsersController', () => {
 
     await expect(controller.findAll()).resolves.toBe(users);
     expect(usersService.findAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return the current user', async () => {
+    const user = { id: 'user-id' };
+    usersService.findById.mockResolvedValue(user);
+
+    await expect(
+      controller.findMe({
+        user: {
+          id: 'user-id',
+          payload: { sub: 'user-id' },
+        },
+      } as never),
+    ).resolves.toBe(user);
+    expect(usersService.findById).toHaveBeenCalledWith('user-id');
   });
 });
