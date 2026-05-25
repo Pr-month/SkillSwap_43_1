@@ -19,7 +19,7 @@ export class User {
   about: string;
 
   @Column({
-    type: 'datetime',
+    type: 'timestamp',
   })
   birthdate: Date;
 
@@ -27,6 +27,7 @@ export class User {
   city: string;
 
   @Column({
+    type: 'enum',
     enum: Gender,
   })
   gender: Gender;
@@ -44,6 +45,7 @@ export class User {
   favoriteSkills: string[];
 
   @Column({
+    type: 'enum',
     enum: Role,
     default: Role.USER,
   })

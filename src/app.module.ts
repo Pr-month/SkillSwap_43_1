@@ -21,6 +21,7 @@ import jwtConfig from './config/jwt.config';
       password: 'admin',
       database: 'skillswap',
       entities: [],
+      autoLoadEntities: true,
       synchronize: true,
     }),
     AuthModule,
