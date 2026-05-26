@@ -3,7 +3,7 @@ import { DataSourceOptions } from 'typeorm';
 
 type DatabaseType = 'postgres' | 'mongodb';
 
-export default registerAs(
+const dbConfig = registerAs(
   'DATABASE_CONFIG',
   (): DataSourceOptions => ({
     type: (process.env.DATABASE_DRIVER as DatabaseType) || 'postgres',
@@ -12,7 +12,10 @@ export default registerAs(
     database: process.env.DATABASE_NAME || 'db',
     username: process.env.DATABASE_USERNAME || 'db',
     password: process.env.DATABASE_PASSWORD,
-    entities: [],
-    synchronize: false,
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    synchronize: process.env.NODE_ENV !== 'production',
   }),
 );
+
+export default dbConfig;
+export type TDbConfig = ReturnType<typeof dbConfig>;
