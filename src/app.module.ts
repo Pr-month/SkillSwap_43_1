@@ -6,12 +6,14 @@ import databaseConfig, { TDbConfig } from './database/database.config';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import appConfig from './app.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
+      load: [databaseConfig, appConfig],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
