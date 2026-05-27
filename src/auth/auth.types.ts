@@ -14,3 +14,8 @@ export type TJwtPayload = {
 export type AuthRequest = Request & {
   user: TJwtPayload;
 };
+
+export type AuthRefreshRequest = Request & {
+  user: TJwtPayload;
+  refreshToken: string;
+};
