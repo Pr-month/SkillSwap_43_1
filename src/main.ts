@@ -7,4 +7,5 @@ async function bootstrap() {
   const config: TAppConfig = app.get(appConfig.KEY);
   await app.listen(config.port);
 }
-bootstrap();
+
+void bootstrap();
