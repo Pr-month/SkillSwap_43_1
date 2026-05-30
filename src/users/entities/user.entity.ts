@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role, Gender } from './user.enums';
+import { Skill } from '../../skills/entities/skill.entity';
 
 @Entity()
 export class User {
@@ -34,14 +42,24 @@ export class User {
   @Column()
   avatar: string;
 
-  @Column('simple-array')
-  skills: string[];
+  @OneToMany(() => Skill, (skill) => skill.owner)
+  skills: Skill[];
 
-  @Column('simple-array')
-  wantToLearn: string[];
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_want_to_learn_skills',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'skill_id', referencedColumnName: 'id' },
+  })
+  wantToLearn: Skill[];
 
-  @Column('simple-array')
-  favoriteSkills: string[];
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_favourite_skills',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'skill_id', referencedColumnName: 'id' },
+  })
+  favoriteSkills: Skill[];
 
   @Column({
     enum: Role,
