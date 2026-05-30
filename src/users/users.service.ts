@@ -1,7 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Gender } from './entities/user.enums';
 import { User } from './entities/user.entity';
+
+type TCreateUserData = {
+  name: string;
+  email: string;
+  password: string;
+  about: string;
+  birthdate: Date;
+  city: string;
+  gender: Gender;
+  avatar: string;
+  skills: string[];
+  wantToLearn: string[];
+  favoriteSkills: string[];
+  refreshToken: string;
+};
 
 @Injectable()
 export class UsersService {
@@ -30,6 +46,12 @@ export class UsersService {
     return this.usersRepository.findOne({
       where: { email },
     });
+  }
+
+  async createUser(createUserData: TCreateUserData): Promise<User> {
+    const user = this.usersRepository.create(createUserData);
+
+    return this.usersRepository.save(user);
   }
 
   async updateRefreshToken(
