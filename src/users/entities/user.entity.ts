@@ -28,7 +28,7 @@ export class User {
   about: string;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
   })
   birthdate: Date;
 
