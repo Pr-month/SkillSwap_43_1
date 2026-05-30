@@ -25,4 +25,19 @@ export class UsersService {
 
     return user;
   }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { email },
+    });
+  }
+
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
+    await this.usersRepository.update(userId, {
+      refreshToken,
+    });
+  }
 }
