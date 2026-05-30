@@ -1,4 +1,7 @@
+import * as bcrypt from 'bcrypt';
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   JoinTable,
@@ -8,6 +11,8 @@ import {
 } from 'typeorm';
 import { Role, Gender } from './user.enums';
 import { Skill } from '../../skills/entities/skill.entity';
+
+const PASSWORD_SALT_ROUNDS = 10;
 
 @Entity()
 export class User {
@@ -35,6 +40,7 @@ export class User {
   city: string;
 
   @Column({
+    type: 'enum',
     enum: Gender,
   })
   gender: Gender;
@@ -62,6 +68,7 @@ export class User {
   favoriteSkills: Skill[];
 
   @Column({
+    type: 'enum',
     enum: Role,
     default: Role.USER,
   })
@@ -69,4 +76,18 @@ export class User {
 
   @Column()
   refreshToken: string;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async encryptPassword(): Promise<void> {
+    if (!this.password || this.isPasswordEncrypted()) {
+      return;
+    }
+
+    this.password = await bcrypt.hash(this.password, PASSWORD_SALT_ROUNDS);
+  }
+
+  private isPasswordEncrypted(): boolean {
+    return /^\$2[aby]\$\d{2}\$/.test(this.password);
+  }
 }
