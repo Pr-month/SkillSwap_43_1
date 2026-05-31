@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { Exclude } from 'class-transformer';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -26,6 +27,7 @@ export class User {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column()
@@ -75,6 +77,7 @@ export class User {
   role: Role;
 
   @Column()
+  @Exclude()
   refreshToken: string;
 
   @BeforeInsert()

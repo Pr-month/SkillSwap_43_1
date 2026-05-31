@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { instanceToPlain } from 'class-transformer';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -9,6 +11,7 @@ describe('UsersService', () => {
   const usersRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
+    save: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -38,6 +41,20 @@ describe('UsersService', () => {
     expect(usersRepository.find).toHaveBeenCalledTimes(1);
   });
 
+  it('should exclude password and refresh token from serialized user data', () => {
+    const user = Object.assign(new User(), {
+      id: 'user-id',
+      email: 'user@example.com',
+      password: 'hashed-password',
+      refreshToken: 'refresh-token',
+    });
+
+    expect(instanceToPlain(user)).toEqual({
+      id: 'user-id',
+      email: 'user@example.com',
+    });
+  });
+
   it('should find a user by id', async () => {
     const user = { id: 'user-id' };
     usersRepository.findOne.mockResolvedValue(user);
@@ -54,5 +71,38 @@ describe('UsersService', () => {
     await expect(service.findById('missing-id')).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it('should update a user password', async () => {
+    const user = {
+      id: 'user-id',
+      password: await bcrypt.hash('old-password', 1),
+    };
+    usersRepository.findOne.mockResolvedValue(user);
+    usersRepository.save.mockResolvedValue({
+      ...user,
+      password: 'new-password',
+    });
+
+    await expect(
+      service.updatePassword('user-id', 'old-password', 'new-password'),
+    ).resolves.toBeUndefined();
+    expect(usersRepository.save).toHaveBeenCalledWith({
+      ...user,
+      password: 'new-password',
+    });
+  });
+
+  it('should throw when the current password is invalid', async () => {
+    const user = {
+      id: 'user-id',
+      password: await bcrypt.hash('old-password', 1),
+    };
+    usersRepository.findOne.mockResolvedValue(user);
+
+    await expect(
+      service.updatePassword('user-id', 'wrong-password', 'new-password'),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(usersRepository.save).not.toHaveBeenCalled();
   });
 });
