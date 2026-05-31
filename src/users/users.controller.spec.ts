@@ -8,6 +8,7 @@ describe('UsersController', () => {
   const usersService = {
     findAll: jest.fn(),
     findById: jest.fn(),
+    updatePassword: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -53,5 +54,29 @@ describe('UsersController', () => {
       } as never),
     ).resolves.toBe(user);
     expect(usersService.findById).toHaveBeenCalledWith('user-id');
+  });
+
+  it('should update the current user password', async () => {
+    usersService.updatePassword.mockResolvedValue(undefined);
+
+    await expect(
+      controller.updateMyPassword(
+        {
+          user: {
+            id: 'user-id',
+            payload: { sub: 'user-id' },
+          },
+        } as never,
+        {
+          currentPassword: 'old-password',
+          newPassword: 'new-password',
+        },
+      ),
+    ).resolves.toBeUndefined();
+    expect(usersService.updatePassword).toHaveBeenCalledWith(
+      'user-id',
+      'old-password',
+      'new-password',
+    );
   });
 });

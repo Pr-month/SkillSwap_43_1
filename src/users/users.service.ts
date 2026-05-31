@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { DeepPartial, Repository } from 'typeorm';
 import { Gender } from './entities/user.enums';
 import { User } from './entities/user.entity';
 
@@ -49,9 +54,30 @@ export class UsersService {
   }
 
   async createUser(createUserData: TCreateUserData): Promise<User> {
-    const user = this.usersRepository.create(createUserData);
+    const user = this.usersRepository.create(
+      createUserData as DeepPartial<User>,
+    );
 
     return this.usersRepository.save(user);
+  }
+
+  async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.findById(userId);
+
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    user.password = newPassword;
+    await this.usersRepository.save(user);
   }
 
   async updateRefreshToken(
