@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { instanceToPlain } from 'class-transformer';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -38,6 +39,20 @@ describe('UsersService', () => {
 
     await expect(service.findAll()).resolves.toBe(users);
     expect(usersRepository.find).toHaveBeenCalledTimes(1);
+  });
+
+  it('should exclude password and refresh token from serialized user data', () => {
+    const user = Object.assign(new User(), {
+      id: 'user-id',
+      email: 'user@example.com',
+      password: 'hashed-password',
+      refreshToken: 'refresh-token',
+    });
+
+    expect(instanceToPlain(user)).toEqual({
+      id: 'user-id',
+      email: 'user@example.com',
+    });
   });
 
   it('should find a user by id', async () => {
