@@ -7,11 +7,7 @@ import { SkillsController } from './skills.controller';
 import { SkillsService } from './skills.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Skill]),
-    AuthModule,
-    UsersModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Skill]), AuthModule, UsersModule],
   controllers: [SkillsController],
   providers: [SkillsService],
 })
