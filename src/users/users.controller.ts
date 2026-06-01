@@ -12,6 +12,7 @@ import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.i
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
+import { PatchCurrentUserDto } from './dto';
 
 @Controller('users')
 export class UsersController {
@@ -40,5 +41,18 @@ export class UsersController {
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(204)
+  @Patch('me')
+  patchCurrentUser(
+    @Req() request: AuthenticatedRequest,
+    @Body() patchCurrentUserDto: PatchCurrentUserDto,
+  ) {
+    return this.usersService.patchCurrentUser(
+      request.user.id,
+      patchCurrentUserDto,
+    );
   }
 }

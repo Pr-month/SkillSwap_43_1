@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { DeepPartial, Repository } from 'typeorm';
 import { Gender } from './entities/user.enums';
 import { User } from './entities/user.entity';
+import { PatchCurrentUserDto } from './dto';
 
 type TCreateUserData = {
   name: string;
@@ -87,5 +88,11 @@ export class UsersService {
     await this.usersRepository.update(userId, {
       refreshToken,
     });
+  }
+
+  async patchCurrentUser(id: string, data: PatchCurrentUserDto): Promise<void> {
+    const user = await this.findById(id);
+    Object.assign(user, data);
+    await this.usersRepository.save(user);
   }
 }
