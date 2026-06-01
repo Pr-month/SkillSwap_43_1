@@ -1,16 +1,17 @@
 import { Request } from 'express';
-
-enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-}
+import { Role } from '../users/entities/user.enums';
 
 export type TJwtPayload = {
   sub: string;
   email: string;
-  role: UserRole;
+  role: Role;
 };
 
 export type AuthRequest = Request & {
   user: TJwtPayload;
+};
+
+export type TAuthTokens = {
+  accessToken: string;
+  refreshToken: string;
 };

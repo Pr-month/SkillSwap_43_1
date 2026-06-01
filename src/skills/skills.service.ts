@@ -1,0 +1,29 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
+import { CreateSkillDto } from './dto/create-skill.dto';
+import { Skill } from './entities/skill.entity';
+
+@Injectable()
+export class SkillsService {
+  constructor(
+    @InjectRepository(Skill)
+    private readonly skillsRepository: Repository<Skill>,
+    private readonly usersService: UsersService,
+  ) {}
+
+  async create(
+    ownerId: string,
+    createSkillDto: CreateSkillDto,
+  ): Promise<Skill> {
+    const owner = await this.usersService.findById(ownerId);
+
+    const skill = this.skillsRepository.create({
+      ...createSkillDto,
+      owner,
+    });
+
+    return this.skillsRepository.save(skill);
+  }
+}
