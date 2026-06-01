@@ -9,7 +9,6 @@ import { DeepPartial, Repository } from 'typeorm';
 import { Gender } from './entities/user.enums';
 import { User } from './entities/user.entity';
 import { PatchCurrentUserDto } from './dto';
-import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 
 type TCreateUserData = {
   name: string;
