@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
-import { diskStorage, FileFilterCallback } from 'multer';
+import { diskStorage, FileFilterCallback, Options } from 'multer';
 import { extname } from 'path';
 
 const allowedMimeTypes = new Set([
@@ -10,7 +10,7 @@ const allowedMimeTypes = new Set([
   'image/webp',
 ]);
 
-export const multerOptions = {
+export const multerOptions: Options = {
   storage: diskStorage({
     destination: './public/uploads',
     filename: (
