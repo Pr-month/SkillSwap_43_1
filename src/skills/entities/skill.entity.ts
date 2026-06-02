@@ -6,6 +6,7 @@ import {
   ManyToOne,
   ManyToMany,
 } from 'typeorm';
+import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
@@ -19,8 +20,9 @@ export class Skill {
   @Column()
   description: string;
 
-  @Column()
-  category: string;
+  @ManyToOne(() => Category, (category) => category)
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 
   @Column('simple-array')
   images: string[];
