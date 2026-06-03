@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AccessTokenGuard } from '../auth/accessToken.guard';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';

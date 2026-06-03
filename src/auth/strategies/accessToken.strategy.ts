@@ -21,13 +21,21 @@ export class AccessTokenStrategy extends PassportStrategy(
 
   validate(payload: AccessTokenPayload): AuthenticatedUser {
     const userId = payload.sub ?? payload.id ?? payload.userId;
+    const role = payload.role;
 
     if (!userId) {
       throw new UnauthorizedException('Access token does not identify a user');
     }
 
+    if (!role) {
+      throw new UnauthorizedException(
+        'Access token does not identify user role',
+      );
+    }
+
     return {
       id: userId,
+      role: role,
       payload,
     };
   }

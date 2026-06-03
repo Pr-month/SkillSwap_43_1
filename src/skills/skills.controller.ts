@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { AccessTokenGuard } from '../auth/accessToken.guard';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { Skill } from './entities/skill.entity';
