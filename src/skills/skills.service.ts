@@ -43,4 +43,20 @@ export class SkillsService {
       .of(userId)
       .remove(skillId);
   }
+
+  async addToFavorites(userId: string, skillId: string): Promise<void> {
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    await this.skillsRepository
+      .createQueryBuilder()
+      .relation(User, 'favoriteSkills')
+      .of(userId)
+      .add(skillId);
+  }
 }

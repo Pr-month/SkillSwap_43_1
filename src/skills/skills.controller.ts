@@ -29,6 +29,16 @@ export class SkillsController {
 
   @UseGuards(AccessTokenGuard)
   @HttpCode(204)
+  @Post(':id/favorite')
+  addToFavorites(
+    @Req() request: AuthenticatedRequest,
+    @Param('id') skillId: string,
+  ): Promise<void> {
+    return this.skillsService.addToFavorites(request.user.id, skillId);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(204)
   @Delete(':id/favorite')
   removeFromFavorites(
     @Req() request: AuthenticatedRequest,

@@ -41,6 +41,27 @@ describe('SkillsService', () => {
     expect(service).toBeDefined();
   });
 
+  it('should add a skill to user favorites', async () => {
+    const relationBuilder = {
+      of: jest.fn().mockReturnThis(),
+      add: jest.fn().mockResolvedValue(undefined),
+    };
+    const queryBuilder = {
+      relation: jest.fn().mockReturnValue(relationBuilder),
+    };
+    skillsRepository.findOne.mockResolvedValue({ id: 'skill-id' });
+    skillsRepository.createQueryBuilder.mockReturnValue(queryBuilder);
+
+    await service.addToFavorites('user-id', 'skill-id');
+
+    expect(skillsRepository.findOne).toHaveBeenCalledWith({
+      where: { id: 'skill-id' },
+    });
+    expect(queryBuilder.relation).toHaveBeenCalledWith(User, 'favoriteSkills');
+    expect(relationBuilder.of).toHaveBeenCalledWith('user-id');
+    expect(relationBuilder.add).toHaveBeenCalledWith('skill-id');
+  });
+
   it('should remove a skill from user favorites', async () => {
     const relationBuilder = {
       of: jest.fn().mockReturnThis(),
@@ -67,6 +88,15 @@ describe('SkillsService', () => {
 
     await expect(
       service.removeFromFavorites('user-id', 'missing-skill-id'),
+    ).rejects.toThrow(NotFoundException);
+    expect(skillsRepository.createQueryBuilder).not.toHaveBeenCalled();
+  });
+
+  it('should throw when adding missing skill to favorites', async () => {
+    skillsRepository.findOne.mockResolvedValue(null);
+
+    await expect(
+      service.addToFavorites('user-id', 'missing-skill-id'),
     ).rejects.toThrow(NotFoundException);
     expect(skillsRepository.createQueryBuilder).not.toHaveBeenCalled();
   });
