@@ -1,3 +1,4 @@
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import {
   Body,
   Controller,
@@ -9,7 +10,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AccessTokenGuard } from '../auth/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';

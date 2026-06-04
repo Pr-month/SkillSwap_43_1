@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AccessTokenGuard } from '../auth/accessToken.guard';
-import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { SkillsController } from './skills.controller';
 import { SkillsService } from './skills.service';
 
