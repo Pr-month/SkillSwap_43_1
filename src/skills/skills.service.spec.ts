@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
@@ -42,22 +42,47 @@ describe('SkillsService', () => {
   });
 
   it('should add a skill to user favorites', async () => {
+    const favoritesCheckBuilder = {
+      innerJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      getCount: jest.fn().mockResolvedValue(0),
+    };
     const relationBuilder = {
       of: jest.fn().mockReturnThis(),
       add: jest.fn().mockResolvedValue(undefined),
     };
-    const queryBuilder = {
+    const relationQueryBuilder = {
       relation: jest.fn().mockReturnValue(relationBuilder),
     };
     skillsRepository.findOne.mockResolvedValue({ id: 'skill-id' });
-    skillsRepository.createQueryBuilder.mockReturnValue(queryBuilder);
+    skillsRepository.createQueryBuilder
+      .mockReturnValueOnce(favoritesCheckBuilder)
+      .mockReturnValueOnce(relationQueryBuilder);
 
     await service.addToFavorites('user-id', 'skill-id');
 
     expect(skillsRepository.findOne).toHaveBeenCalledWith({
       where: { id: 'skill-id' },
     });
-    expect(queryBuilder.relation).toHaveBeenCalledWith(User, 'favoriteSkills');
+    expect(skillsRepository.createQueryBuilder).toHaveBeenNthCalledWith(
+      1,
+      'skill',
+    );
+    expect(favoritesCheckBuilder.innerJoin).toHaveBeenCalledWith(
+      'skill.favoriteBy',
+      'user',
+      'user.id = :userId',
+      { userId: 'user-id' },
+    );
+    expect(favoritesCheckBuilder.where).toHaveBeenCalledWith(
+      'skill.id = :skillId',
+      { skillId: 'skill-id' },
+    );
+    expect(favoritesCheckBuilder.getCount).toHaveBeenCalled();
+    expect(relationQueryBuilder.relation).toHaveBeenCalledWith(
+      User,
+      'favoriteSkills',
+    );
     expect(relationBuilder.of).toHaveBeenCalledWith('user-id');
     expect(relationBuilder.add).toHaveBeenCalledWith('skill-id');
   });
@@ -99,5 +124,20 @@ describe('SkillsService', () => {
       service.addToFavorites('user-id', 'missing-skill-id'),
     ).rejects.toThrow(NotFoundException);
     expect(skillsRepository.createQueryBuilder).not.toHaveBeenCalled();
+  });
+
+  it('should throw when adding already favorited skill', async () => {
+    const favoritesCheckBuilder = {
+      innerJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      getCount: jest.fn().mockResolvedValue(1),
+    };
+    skillsRepository.findOne.mockResolvedValue({ id: 'skill-id' });
+    skillsRepository.createQueryBuilder.mockReturnValue(favoritesCheckBuilder);
+
+    await expect(service.addToFavorites('user-id', 'skill-id')).rejects.toThrow(
+      ConflictException,
+    );
+    expect(skillsRepository.createQueryBuilder).toHaveBeenCalledTimes(1);
   });
 });

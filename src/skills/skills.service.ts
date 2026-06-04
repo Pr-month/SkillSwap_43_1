@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
@@ -51,6 +55,16 @@ export class SkillsService {
 
     if (!skill) {
       throw new NotFoundException('Skill not found');
+    }
+
+    const alreadyInFavorites = await this.skillsRepository
+      .createQueryBuilder('skill')
+      .innerJoin('skill.favoriteBy', 'user', 'user.id = :userId', { userId })
+      .where('skill.id = :skillId', { skillId })
+      .getCount();
+
+    if (alreadyInFavorites > 0) {
+      throw new ConflictException('Skill is already in favorites');
     }
 
     await this.skillsRepository
