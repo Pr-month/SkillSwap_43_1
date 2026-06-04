@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { Skill } from './entities/skill.entity';
 
@@ -25,5 +26,21 @@ export class SkillsService {
     });
 
     return this.skillsRepository.save(skill);
+  }
+
+  async removeFromFavorites(userId: string, skillId: string): Promise<void> {
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    await this.skillsRepository
+      .createQueryBuilder()
+      .relation(User, 'favoriteSkills')
+      .of(userId)
+      .remove(skillId);
   }
 }
