@@ -1,37 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { jwtConfig, TJwtConfig } from '../config/jwt.config';
 
 @Injectable()
 export class JwtTokenService {
   constructor(
-    private readonly configService: ConfigService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfig: TJwtConfig,
     private readonly jwtService: JwtService,
   ) {}
 
   signAccessToken(payload: Record<string, unknown>): Promise<string> {
     return this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-      expiresIn: this.configService.get('JWT_ACCESS_EXPIRES_IN'),
+      secret: this.jwtConfig.access.secret,
+      expiresIn: this.jwtConfig.access.expiresIn,
     });
   }
 
   verifyAccessToken(token: string) {
     return this.jwtService.verifyAsync(token, {
-      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+      secret: this.jwtConfig.access.secret,
     });
   }
 
   signRefreshToken(payload: Record<string, unknown>): Promise<string> {
     return this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
+      secret: this.jwtConfig.refresh.secret,
+      expiresIn: this.jwtConfig.refresh.expiresIn,
     });
   }
 
   verifyRefreshToken(token: string) {
     return this.jwtService.verifyAsync(token, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      secret: this.jwtConfig.refresh.secret,
     });
   }
 }
