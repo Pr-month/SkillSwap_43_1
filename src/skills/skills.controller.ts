@@ -4,6 +4,7 @@ import {
   Delete,
   HttpCode,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -11,6 +12,7 @@ import {
 import { AccessTokenGuard } from '../auth/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { CreateSkillDto } from './dto/create-skill.dto';
+import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { SkillsService } from './skills.service';
 
@@ -25,6 +27,16 @@ export class SkillsController {
     @Body() createSkillDto: CreateSkillDto,
   ): Promise<Skill> {
     return this.skillsService.create(request.user.id, createSkillDto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id')
+  update(
+    @Req() request: AuthenticatedRequest,
+    @Param('id') skillId: string,
+    @Body() updateSkillDto: UpdateSkillDto,
+  ): Promise<Skill> {
+    return this.skillsService.update(request.user.id, skillId, updateSkillDto);
   }
 
   @UseGuards(AccessTokenGuard)

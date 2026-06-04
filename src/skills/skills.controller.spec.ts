@@ -8,6 +8,7 @@ describe('SkillsController', () => {
   let controller: SkillsController;
   const skillsService = {
     create: jest.fn(),
+    update: jest.fn(),
     addToFavorites: jest.fn(),
     removeFromFavorites: jest.fn(),
   };
@@ -47,6 +48,28 @@ describe('SkillsController', () => {
       'user-id',
       'skill-id',
     );
+  });
+
+  it('should update skill', async () => {
+    const request = {
+      user: { id: 'user-id' },
+    } as unknown as AuthenticatedRequest;
+    const skillId = 'skill-id';
+    const updateSkillDto = { title: 'Updated title' };
+    const updatedSkill = {
+      id: 'skill-id',
+      title: 'Updated title',
+    };
+    skillsService.update.mockResolvedValue(updatedSkill);
+
+    const result = await controller.update(request, skillId, updateSkillDto);
+
+    expect(skillsService.update).toHaveBeenCalledWith(
+      'user-id',
+      'skill-id',
+      updateSkillDto,
+    );
+    expect(result).toBe(updatedSkill);
   });
 
   it('should remove skill from favorites', async () => {
