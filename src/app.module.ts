@@ -10,6 +10,7 @@ import appConfig from './config/app.config';
 import { jwtConfig } from './config/jwt.config';
 import { SkillsModule } from './skills/skills.module';
 import { CategoriesModule } from './categories/categories.module';
+import { FilesModule } from './files/files.module';
 import { RequestsModule } from './requests/requests.module';
 
 @Module({
@@ -27,6 +28,7 @@ import { RequestsModule } from './requests/requests.module';
     UsersModule,
     SkillsModule,
     CategoriesModule,
+    FilesModule,
     RequestsModule,
   ],
   controllers: [AppController],
