@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -51,6 +53,20 @@ export class RequestsController {
       request.user.id,
       requestId,
       changeRequestStatusDto,
+    );
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete(':id')
+  @HttpCode(204)
+  async deleteRequest(
+    @Req() request: AuthenticatedRequest,
+    @Param(':id') requestId: string,
+  ): Promise<void> {
+    await this.requestsService.deleteRequest(
+      request.user.id,
+      request.user.role,
+      requestId,
     );
   }
 }

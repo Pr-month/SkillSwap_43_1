@@ -10,6 +10,7 @@ import { UsersService } from '../users/users.service';
 import { SkillsService } from '../skills/skills.service';
 import { CreateRequestStatusDto } from './dto';
 import { ChangeRequestStatusDto } from './dto/changeRequest.dto';
+import { Role } from '../users/entities/user.enums';
 
 @Injectable()
 export class RequestsService {
@@ -81,5 +82,20 @@ export class RequestsService {
     request.status = changeRequestStatusDto.status;
 
     return this.requestsRepository.save(request);
+  }
+
+  async deleteRequest(
+    userId: string,
+    userRole: Role,
+    requestId: string,
+  ): Promise<void> {
+    const user = await this.usersService.findById(userId);
+    const request = await this.findById(requestId);
+
+    if (request.sender !== user || userRole !== Role.ADMIN) {
+      throw new ForbiddenException('Forbidden for you');
+    }
+
+    await this.requestsRepository.delete(request);
   }
 }
