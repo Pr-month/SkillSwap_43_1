@@ -14,8 +14,7 @@ import { RequestsService } from './requests.service';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { Request } from './entities/request.entity';
-import { CreateRequestStatusDto } from './dto';
-import { ChangeRequestStatusDto } from './dto/changeRequest.dto';
+import { ChangeRequestStatusDto, CreateRequestDto } from './dto';
 
 @Controller('requests')
 export class RequestsController {
@@ -25,7 +24,7 @@ export class RequestsController {
   @Post()
   create(
     @Req() request: AuthenticatedRequest,
-    @Body() createRequestDto: CreateRequestStatusDto,
+    @Body() createRequestDto: CreateRequestDto,
   ): Promise<Request> {
     return this.requestsService.create(request.user.id, createRequestDto);
   }

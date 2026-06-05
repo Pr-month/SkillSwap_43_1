@@ -8,8 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { SkillsService } from '../skills/skills.service';
-import { CreateRequestStatusDto } from './dto';
-import { ChangeRequestStatusDto } from './dto/changeRequest.dto';
+import { ChangeRequestStatusDto, CreateRequestDto } from './dto';
 import { Role } from '../users/entities/user.enums';
 
 @Injectable()
@@ -35,7 +34,7 @@ export class RequestsService {
 
   async create(
     ownerId: string,
-    createRequestDto: CreateRequestStatusDto,
+    createRequestDto: CreateRequestDto,
   ): Promise<RequestEntity> {
     const requestedSkill = await this.skillsService.findById(
       createRequestDto.requestedSkill,
