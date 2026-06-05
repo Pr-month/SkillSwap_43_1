@@ -14,6 +14,8 @@ import { Skill } from './entities/skill.entity';
 import { GetSkillsDto } from './dto/get-skills.dto';
 import { GetSkillsResponseDto } from './dto/get-skills-response.dto';
 import { Category } from 'src/categories/entities/category.entity';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 @Injectable()
 export class SkillsService {
@@ -158,5 +160,33 @@ export class SkillsService {
       page,
       totalPages,
     };
+  }
+
+  async delete(userId: string, skillId: string): Promise<void> {
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+      relations: {
+        owner: true,
+      },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('You can only delete your own skills');
+    }
+    await Promise.all(
+      skill.images.map(async (image) => {
+        try {
+          await unlink(join(process.cwd(), 'public', 'uploads', image));
+        } catch {
+          // ignore error if file does not exist
+        }
+      }),
+    );
+
+    await this.skillsRepository.delete(skillId);
   }
 }

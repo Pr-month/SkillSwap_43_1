@@ -67,4 +67,13 @@ export class SkillsController {
   findAll(@Query() getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
     return this.skillsService.findAll(getSkillsDto);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete(':id')
+  delete(
+    @Req() request: AuthenticatedRequest,
+    @Param('id') skillId: string,
+  ): Promise<void> {
+    return this.skillsService.delete(request.user.id, skillId);
+  }
 }
