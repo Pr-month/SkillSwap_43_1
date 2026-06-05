@@ -13,12 +13,15 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { GetSkillsDto } from './dto/get-skills.dto';
 import { GetSkillsResponseDto } from './dto/get-skills-response.dto';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class SkillsService {
   constructor(
     @InjectRepository(Skill)
     private readonly skillsRepository: Repository<Skill>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
     private readonly usersService: UsersService,
   ) {}
 
@@ -26,11 +29,21 @@ export class SkillsService {
     ownerId: string,
     createSkillDto: CreateSkillDto,
   ): Promise<Skill> {
+    const { categoryId, ...rest } = createSkillDto;
     const owner = await this.usersService.findById(ownerId);
 
+    const category = await this.categoryRepository.findOneBy({
+      id: categoryId,
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
     const skill = this.skillsRepository.create({
-      ...createSkillDto,
+      ...rest,
       owner,
+      category,
     });
 
     return this.skillsRepository.save(skill);
@@ -98,19 +111,25 @@ export class SkillsService {
       .relation(User, 'favoriteSkills')
       .of(userId)
       .add(skillId);
-  async findAll(getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
-    const { page = 1, limit = 10, search = '', category } = getSkillsDto;
+  }
 
-    const queryBuilder = this.skillsRepository.createQueryBuilder('skill');
+  async findAll(getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
+    const { page = 1, limit = 20, search = '', category } = getSkillsDto;
+
+    const queryBuilder = this.skillsRepository
+      .createQueryBuilder('skill')
+      .leftJoinAndSelect('skill.category', 'category')
+      .leftJoinAndSelect('category.parent', 'parent');
 
     if (search) {
       queryBuilder.andWhere(
         `
-        (
-          skill.title ILIKE :search
-          OR skill.category ILIKE :search
-        )
-        `,
+            (
+              skill.title ILIKE :search
+              OR category.name ILIKE :search
+              OR parent.name ILIKE :search
+            )
+          `,
         {
           search: `%${search}%`,
         },
@@ -118,7 +137,7 @@ export class SkillsService {
     }
 
     if (category) {
-      queryBuilder.andWhere('skill.category ILIKE :category', {
+      queryBuilder.andWhere('category.name ILIKE :category', {
         category: `%${category}%`,
       });
     }

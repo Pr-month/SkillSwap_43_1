@@ -3,10 +3,12 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +18,7 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { SkillsService } from './skills.service';
 import { GetSkillsDto } from './dto/get-skills.dto';
+import { GetSkillsResponseDto } from './dto/get-skills-response.dto';
 
 @Controller('skills')
 export class SkillsController {
@@ -58,8 +61,10 @@ export class SkillsController {
     @Param('id') skillId: string,
   ): Promise<void> {
     return this.skillsService.removeFromFavorites(request.user.id, skillId);
+  }
+
   @Get()
-  findAll(@Query() getSkillsDto: GetSkillsDto) {
+  findAll(@Query() getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
     return this.skillsService.findAll(getSkillsDto);
   }
 }

@@ -1,4 +1,10 @@
-import { ArrayMinSize, IsArray, IsNotEmpty, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateSkillDto {
   @IsString()
@@ -9,9 +15,9 @@ export class CreateSkillDto {
   @IsNotEmpty()
   description: string;
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  category: string;
+  categoryId: string;
 
   @IsArray()
   @ArrayMinSize(1)
