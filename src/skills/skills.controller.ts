@@ -15,6 +15,7 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { SkillsService } from './skills.service';
+import { GetSkillsDto } from './dto/get-skills.dto';
 
 @Controller('skills')
 export class SkillsController {
@@ -57,5 +58,8 @@ export class SkillsController {
     @Param('id') skillId: string,
   ): Promise<void> {
     return this.skillsService.removeFromFavorites(request.user.id, skillId);
+  @Get()
+  findAll(@Query() getSkillsDto: GetSkillsDto) {
+    return this.skillsService.findAll(getSkillsDto);
   }
 }

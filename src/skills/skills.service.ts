@@ -11,6 +11,8 @@ import { User } from '../users/entities/user.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
+import { GetSkillsDto } from './dto/get-skills.dto';
+import { GetSkillsResponseDto } from './dto/get-skills-response.dto';
 
 @Injectable()
 export class SkillsService {
@@ -96,5 +98,46 @@ export class SkillsService {
       .relation(User, 'favoriteSkills')
       .of(userId)
       .add(skillId);
+  async findAll(getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
+    const { page = 1, limit = 10, search = '', category } = getSkillsDto;
+
+    const queryBuilder = this.skillsRepository.createQueryBuilder('skill');
+
+    if (search) {
+      queryBuilder.andWhere(
+        `
+        (
+          skill.title ILIKE :search
+          OR skill.category ILIKE :search
+        )
+        `,
+        {
+          search: `%${search}%`,
+        },
+      );
+    }
+
+    if (category) {
+      queryBuilder.andWhere('skill.category ILIKE :category', {
+        category: `%${category}%`,
+      });
+    }
+
+    const [skills, total] = await queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+
+    if (page > totalPages && total > 0) {
+      throw new NotFoundException(`Страница ${page} не существует`);
+    }
+
+    return {
+      data: skills,
+      page,
+      totalPages,
+    };
   }
 }
