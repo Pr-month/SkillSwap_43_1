@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
@@ -16,5 +16,11 @@ export class RequestsController {
     @Body() createRequestDto: CreateRequestDto,
   ): Promise<Request> {
     return this.requestsService.create(request.user.id, createRequestDto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('incoming')
+  getIncoming(@Req() request: AuthenticatedRequest): Promise<Request[]> {
+    return this.requestsService.getIncoming(request.user.id);
   }
 }

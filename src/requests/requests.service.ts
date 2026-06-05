@@ -36,4 +36,10 @@ export class RequestsService {
 
     return this.requestsRepository.save(request);
   }
+
+  async getIncoming(userId: string): Promise<RequestEntity[]> {
+    const user = await this.usersService.findById(userId);
+
+    return user.incomingRequests;
+  }
 }
