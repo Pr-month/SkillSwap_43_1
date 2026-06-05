@@ -1,9 +1,19 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { Request } from './entities/request.entity';
-import { CreateRequestDto } from './dto';
+import { CreateRequestStatusDto } from './dto';
+import { ChangeRequestStatusDto } from './dto/changeRequest.dto';
 
 @Controller('requests')
 export class RequestsController {
@@ -13,7 +23,7 @@ export class RequestsController {
   @Post()
   create(
     @Req() request: AuthenticatedRequest,
-    @Body() createRequestDto: CreateRequestDto,
+    @Body() createRequestDto: CreateRequestStatusDto,
   ): Promise<Request> {
     return this.requestsService.create(request.user.id, createRequestDto);
   }
@@ -28,5 +38,19 @@ export class RequestsController {
   @Get('outgoing')
   getOutgoing(@Req() request: AuthenticatedRequest): Promise<Request[]> {
     return this.requestsService.getOutgoing(request.user.id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id')
+  changeRequestStatus(
+    @Req() request: AuthenticatedRequest,
+    @Param(':id') requestId: string,
+    @Body() changeRequestStatusDto: ChangeRequestStatusDto,
+  ): Promise<Request> {
+    return this.requestsService.changeRequestStatus(
+      request.user.id,
+      requestId,
+      changeRequestStatusDto,
+    );
   }
 }

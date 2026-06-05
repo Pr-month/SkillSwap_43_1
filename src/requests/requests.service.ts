@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Request as RequestEntity } from './entities/request.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { SkillsService } from '../skills/skills.service';
-import { CreateRequestDto } from './dto';
+import { CreateRequestStatusDto } from './dto';
+import { ChangeRequestStatusDto } from './dto/changeRequest.dto';
 
 @Injectable()
 export class RequestsService {
@@ -15,9 +20,21 @@ export class RequestsService {
     private readonly skillsService: SkillsService,
   ) {}
 
+  async findById(requestId: string): Promise<RequestEntity> {
+    const request = await this.requestsRepository.findOne({
+      where: { id: requestId },
+    });
+
+    if (!request) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    return request;
+  }
+
   async create(
     ownerId: string,
-    createRequestDto: CreateRequestDto,
+    createRequestDto: CreateRequestStatusDto,
   ): Promise<RequestEntity> {
     const requestedSkill = await this.skillsService.findById(
       createRequestDto.requestedSkill,
@@ -47,5 +64,22 @@ export class RequestsService {
     const user = await this.usersService.findById(userId);
 
     return user.outgoingRequests;
+  }
+
+  async changeRequestStatus(
+    userId: string,
+    requestId: string,
+    changeRequestStatusDto: ChangeRequestStatusDto,
+  ): Promise<RequestEntity> {
+    const user = await this.usersService.findById(userId);
+    const request = await this.findById(requestId);
+
+    if (request.receiver !== user) {
+      throw new ForbiddenException('Forbidden for you');
+    }
+
+    request.status = changeRequestStatusDto.status;
+
+    return this.requestsRepository.save(request);
   }
 }

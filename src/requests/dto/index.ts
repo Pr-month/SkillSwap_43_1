@@ -1,1 +1,1 @@
-export { CreateRequestDto } from './createRequest.dto';
+export { CreateRequestStatusDto } from './createRequestStatus.dto';

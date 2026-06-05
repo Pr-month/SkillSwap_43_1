@@ -1,4 +1,4 @@
-export interface CreateRequestDto {
+export interface CreateRequestStatusDto {
   requestedSkill: string;
   offeredSkill: string;
 }
