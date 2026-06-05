@@ -42,4 +42,10 @@ export class RequestsService {
 
     return user.incomingRequests;
   }
+
+  async getOutgoing(userId: string): Promise<RequestEntity[]> {
+    const user = await this.usersService.findById(userId);
+
+    return user.outgoingRequests;
+  }
 }

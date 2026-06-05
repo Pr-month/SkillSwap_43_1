@@ -23,4 +23,10 @@ export class RequestsController {
   getIncoming(@Req() request: AuthenticatedRequest): Promise<Request[]> {
     return this.requestsService.getIncoming(request.user.id);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('outgoing')
+  getOutgoing(@Req() request: AuthenticatedRequest): Promise<Request[]> {
+    return this.requestsService.getOutgoing(request.user.id);
+  }
 }
