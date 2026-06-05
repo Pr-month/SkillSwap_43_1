@@ -48,6 +48,9 @@ export class Request {
   @JoinColumn({ name: 'requestedSkillId' })
   requestedSkill: Skill;
 
-  @Column('boolean')
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
   isRead: boolean;
 }
