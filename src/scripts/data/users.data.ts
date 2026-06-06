@@ -1,9 +1,10 @@
+import 'dotenv/config';
 import { Role, Gender } from '../../users/entities/user.enums';
 
 export const ADMIN_DATA = {
   name: 'Admin',
-  email: 'admin@skillswap.com',
-  password: 'Admin1234!',
+  email: process.env.ADMIN_EMAIL || 'admin@skillswap.com',
+  password: process.env.ADMIN_PASSWORD || 'Admin1234!',
   about: 'Platform administrator',
   birthdate: new Date('1990-01-01'),
   city: 'Moscow',
@@ -34,18 +35,6 @@ export const USERS_DATA = [
     birthdate: new Date('1992-07-22'),
     city: 'Kazan',
     gender: Gender.MALE,
-    avatar: '',
-    role: Role.USER,
-    refreshToken: null,
-  },
-  {
-    name: 'Clara Lee',
-    email: 'clara@example.com',
-    password: 'Clara1234!',
-    about: 'UX designer with 5 years of experience',
-    birthdate: new Date('1998-11-05'),
-    city: 'Novosibirsk',
-    gender: Gender.FEMALE,
     avatar: '',
     role: Role.USER,
     refreshToken: null,
