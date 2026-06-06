@@ -76,9 +76,9 @@ export class User {
   })
   role: Role;
 
-  @Column()
+  @Column({ nullable: true, type: 'varchar' })
   @Exclude()
-  refreshToken: string;
+  refreshToken: string | null;
 
   @BeforeInsert()
   @BeforeUpdate()
