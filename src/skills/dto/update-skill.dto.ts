@@ -2,26 +2,30 @@ import {
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
+  IsOptional,
   IsString,
-  IsUUID,
 } from 'class-validator';
 
-export class CreateSkillDto {
+export class UpdateSkillDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  title: string;
+  title?: string;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  description: string;
+  description?: string;
 
-  @IsUUID()
+  @IsOptional()
+  @IsString()
   @IsNotEmpty()
-  categoryId: string;
+  category?: string;
 
+  @IsOptional()
   @IsArray()
   @ArrayMinSize(1)
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  images: string[];
+  images?: string[];
 }

@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { Role, Gender } from './user.enums';
 import { Skill } from '../../skills/entities/skill.entity';
+import { Request } from '../../requests/entities/request.entity';
 
 const PASSWORD_SALT_ROUNDS = 10;
 
@@ -79,6 +80,12 @@ export class User {
   @Column()
   @Exclude()
   refreshToken: string;
+
+  @OneToMany(() => Request, (request) => request.sender)
+  outgoingRequests: Request[];
+
+  @OneToMany(() => Request, (request) => request.receiver)
+  incomingRequests: Request[];
 
   @BeforeInsert()
   @BeforeUpdate()
