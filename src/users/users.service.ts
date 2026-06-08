@@ -90,6 +90,12 @@ export class UsersService {
     });
   }
 
+  async clearRefreshToken(userId: string): Promise<void> {
+    await this.usersRepository.update(userId, {
+      refreshToken: null,
+    });
+  }
+
   async patchCurrentUser(id: string, data: PatchCurrentUserDto): Promise<void> {
     const user = await this.findById(id);
     Object.assign(user, data);

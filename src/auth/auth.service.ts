@@ -107,4 +107,18 @@ export class AuthService {
       refreshToken,
     };
   }
+
+  async logout(userId: string, currentRefreshToken: string): Promise<void> {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    if (!user.refreshToken || user.refreshToken !== currentRefreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    await this.usersService.clearRefreshToken(user.id);
+  }
 }
