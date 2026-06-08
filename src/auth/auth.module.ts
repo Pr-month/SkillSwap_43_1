@@ -15,7 +15,7 @@ import { RolesGuard } from './guards/role.guard';
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenGuard, AccessTokenStrategy],
+  providers: [AuthService, AccessTokenGuard, AccessTokenStrategy, RolesGuard],
   exports: [AccessTokenGuard, RolesGuard],
 })
 export class AuthModule {}
