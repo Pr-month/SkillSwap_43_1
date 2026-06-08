@@ -10,5 +10,6 @@ import { SkillsService } from './skills.service';
   imports: [TypeOrmModule.forFeature([Skill]), AuthModule, UsersModule],
   controllers: [SkillsController],
   providers: [SkillsService],
+  exports: [SkillsService],
 })
 export class SkillsModule {}

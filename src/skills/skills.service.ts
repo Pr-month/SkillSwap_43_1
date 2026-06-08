@@ -27,6 +27,18 @@ export class SkillsService {
     private readonly usersService: UsersService,
   ) {}
 
+  async findById(skillId: string): Promise<Skill> {
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    return skill;
+  }
+
   async create(
     ownerId: string,
     createSkillDto: CreateSkillDto,
