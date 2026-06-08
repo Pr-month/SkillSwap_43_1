@@ -33,4 +33,11 @@ export class AuthController {
   refresh(@Req() req: AuthRefreshRequest): Promise<TAuthTokens> {
     return this.authService.refreshTokens(req.user.sub, req.refreshToken);
   }
+
+  @UseGuards(RefreshTokenGuard)
+  @HttpCode(200)
+  @Post('logout')
+  logout(@Req() req: AuthRefreshRequest): Promise<void> {
+    return this.authService.logout(req.user.sub, req.refreshToken);
+  }
 }
