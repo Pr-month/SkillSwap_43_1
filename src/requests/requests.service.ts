@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -26,7 +27,7 @@ export class RequestsService {
     });
 
     if (!request) {
-      throw new NotFoundException('Skill not found');
+      throw new NotFoundException('Request not found');
     }
 
     return request;
@@ -36,16 +37,22 @@ export class RequestsService {
     ownerId: string,
     createRequestDto: CreateRequestDto,
   ): Promise<RequestEntity> {
-    const requestedSkill = await this.skillsService.findById(
-      createRequestDto.requestedSkill,
-    );
+    const sender = await this.usersService.findById(ownerId);
     const offeredSkill = await this.skillsService.findById(
       createRequestDto.offeredSkill,
     );
-    const sender = await this.usersService.findById(ownerId);
+
+    if (offeredSkill.owner.id !== sender.id)
+      throw new BadRequestException("Cannot offer someone else's skill");
+
+    const requestedSkill = await this.skillsService.findById(
+      createRequestDto.requestedSkill,
+    );
+
+    if (requestedSkill.owner.id === sender.id)
+      throw new BadRequestException('Cannot send request to yourself');
 
     const request = this.requestsRepository.create({
-      sender,
       receiver: requestedSkill.owner,
       requestedSkill,
       offeredSkill,
@@ -55,15 +62,19 @@ export class RequestsService {
   }
 
   async getIncoming(userId: string): Promise<RequestEntity[]> {
-    const user = await this.usersService.findById(userId);
-
-    return user.incomingRequests;
+    return await this.requestsRepository.find({
+      where: {
+        receiver: { id: userId },
+      },
+    });
   }
 
   async getOutgoing(userId: string): Promise<RequestEntity[]> {
-    const user = await this.usersService.findById(userId);
-
-    return user.outgoingRequests;
+    return await this.requestsRepository.find({
+      where: {
+        sender: { id: userId },
+      },
+    });
   }
 
   async changeRequestStatus(

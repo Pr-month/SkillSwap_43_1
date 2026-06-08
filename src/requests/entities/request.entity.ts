@@ -35,6 +35,7 @@ export class Request {
   receiver: User;
 
   @Column({
+    type: 'enum',
     enum: REQUEST_STATUS,
     default: REQUEST_STATUS.PENDING,
   })
