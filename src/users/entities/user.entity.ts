@@ -77,9 +77,9 @@ export class User {
   })
   role: Role;
 
-  @Column()
+  @Column({ nullable: true, type: 'varchar' })
   @Exclude()
-  refreshToken: string;
+  refreshToken: string | null;
 
   @OneToMany(() => Request, (request) => request.sender)
   outgoingRequests: Request[];
