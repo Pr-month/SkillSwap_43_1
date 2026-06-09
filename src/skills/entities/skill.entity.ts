@@ -5,8 +5,11 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
+import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
+import { Request } from '../../requests/entities/request.entity';
 
 @Entity()
 export class Skill {
@@ -19,8 +22,9 @@ export class Skill {
   @Column()
   description: string;
 
-  @Column()
-  category: string;
+  @ManyToOne(() => Category, (category) => category)
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 
   @Column('simple-array')
   images: string[];
@@ -34,4 +38,10 @@ export class Skill {
 
   @ManyToMany(() => User, (user) => user.favoriteSkills)
   favoriteBy: User[];
+
+  @OneToMany(() => Request, (request) => request.offeredSkill)
+  offeredRequests: Request[];
+
+  @OneToMany(() => Request, (request) => request.requestedSkill)
+  requestedRequests: Request[];
 }

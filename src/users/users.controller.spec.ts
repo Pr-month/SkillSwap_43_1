@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AccessTokenGuard } from '../auth/accessToken.guard';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
