@@ -1,6 +1,6 @@
 import { AppDataSource } from 'src/config/database.config';
 import { CategoriesData } from './data/seed.categories.data';
-import { Category } from 'src/skills/entities/category.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 export async function seedCategories() {
   await AppDataSource.initialize();
@@ -14,9 +14,28 @@ export async function seedCategories() {
     return;
   }
 
+  const parentCategoriesMap = new Map<string, string>();
+
   for (const category of CategoriesData) {
-    const newCategory = categoryRepo.create(category);
-    await categoryRepo.save(newCategory);
+    const parentCategory = categoryRepo.create({ name: category.name });
+    const savedParentCategory = await categoryRepo.save(parentCategory);
+    parentCategoriesMap.set(category.name, savedParentCategory.id);
+  }
+
+  for (const category of CategoriesData) {
+    const parentCategoryId = parentCategoriesMap.get(category.name);
+
+    if (!parentCategoryId) {
+      continue;
+    }
+
+    for (const childName of category.children) {
+      const childCategory = categoryRepo.create({
+        name: childName,
+        parent: { id: parentCategoryId } as Category,
+      });
+      await categoryRepo.save(childCategory);
+    }
   }
   console.log('Сидинг категорий завершен');
 }
