@@ -4,7 +4,7 @@ import {
   INestApplication,
   ValidationPipe,
 } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { Reflector } from '@nestjs/core';
