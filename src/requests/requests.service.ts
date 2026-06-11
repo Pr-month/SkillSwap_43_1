@@ -85,7 +85,7 @@ export class RequestsService {
     const user = await this.usersService.findById(userId);
     const request = await this.findById(requestId);
 
-    if (request.receiver !== user) {
+    if (request.receiver.id !== user.id) {
       throw new ForbiddenException('Forbidden for you');
     }
 
@@ -102,7 +102,7 @@ export class RequestsService {
     const user = await this.usersService.findById(userId);
     const request = await this.findById(requestId);
 
-    if (request.sender !== user || userRole !== Role.ADMIN) {
+    if (request.sender.id !== user.id && userRole !== Role.ADMIN) {
       throw new ForbiddenException('Forbidden for you');
     }
 

@@ -45,7 +45,7 @@ export class RequestsController {
   @Patch(':id')
   changeRequestStatus(
     @Req() request: AuthenticatedRequest,
-    @Param(':id') requestId: string,
+    @Param('id') requestId: string,
     @Body() changeRequestStatusDto: ChangeRequestStatusDto,
   ): Promise<Request> {
     return this.requestsService.changeRequestStatus(
@@ -60,7 +60,7 @@ export class RequestsController {
   @HttpCode(204)
   async deleteRequest(
     @Req() request: AuthenticatedRequest,
-    @Param(':id') requestId: string,
+    @Param('id') requestId: string,
   ): Promise<void> {
     await this.requestsService.deleteRequest(
       request.user.id,
