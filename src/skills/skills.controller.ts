@@ -13,6 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
+import { User } from '../users/entities/user.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
@@ -66,6 +67,11 @@ export class SkillsController {
   @Get()
   findAll(@Query() getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
     return this.skillsService.findAll(getSkillsDto);
+  }
+
+  @Get(':id/similar')
+  findSimilarUsers(@Param('id') skillId: string): Promise<User[]> {
+    return this.skillsService.findSimilarUsers(skillId, 10);
   }
 
   @UseGuards(AccessTokenGuard)
