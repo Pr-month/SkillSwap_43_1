@@ -14,6 +14,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
+import { User } from '../users/entities/user.entity';
 import {
   ApiSkillsAddToFavorites,
   ApiSkillsCreate,
@@ -81,6 +82,11 @@ export class SkillsController {
   @Get()
   findAll(@Query() getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
     return this.skillsService.findAll(getSkillsDto);
+  }
+
+  @Get(':id/similar')
+  findSimilarUsers(@Param('id') skillId: string): Promise<User[]> {
+    return this.skillsService.findSimilarUsers(skillId, 10);
   }
 
   @ApiSkillsDelete()
