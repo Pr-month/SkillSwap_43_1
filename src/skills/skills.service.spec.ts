@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UsersService } from '../users/users.service';
+import { Category } from '../categories/entities/category.entity';
 import { User } from '../users/entities/user.entity';
 import { Skill } from './entities/skill.entity';
 import { SkillsService } from './skills.service';
@@ -16,6 +17,12 @@ describe('SkillsService', () => {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
+    createQueryBuilder: jest.fn(),
+  };
+  const categoryRepository = {
+    findOneBy: jest.fn(),
+  };
+  const usersRepository = {
     createQueryBuilder: jest.fn(),
   };
   const usersService = {
@@ -30,6 +37,14 @@ describe('SkillsService', () => {
         {
           provide: getRepositoryToken(Skill),
           useValue: skillsRepository,
+        },
+        {
+          provide: getRepositoryToken(Category),
+          useValue: categoryRepository,
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: usersRepository,
         },
         {
           provide: UsersService,
@@ -196,5 +211,55 @@ describe('SkillsService', () => {
       ConflictException,
     );
     expect(skillsRepository.createQueryBuilder).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return users with skills in the same category', async () => {
+    const usersByCategoryQueryBuilder = {
+      innerJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      distinct: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getMany: jest
+        .fn()
+        .mockResolvedValue([{ id: 'user-1' }, { id: 'user-2' }]),
+    };
+    skillsRepository.findOne.mockResolvedValue({
+      id: 'skill-id',
+      category: { id: 'category-id' },
+    });
+    usersRepository.createQueryBuilder.mockReturnValue(
+      usersByCategoryQueryBuilder,
+    );
+
+    const result = await service.findSimilarUsers('skill-id');
+
+    expect(skillsRepository.findOne).toHaveBeenCalledWith({
+      where: { id: 'skill-id' },
+      relations: { category: true },
+    });
+    expect(usersRepository.createQueryBuilder).toHaveBeenCalledWith('user');
+    expect(usersByCategoryQueryBuilder.innerJoin).toHaveBeenCalledWith(
+      'user.skills',
+      'skill',
+    );
+    expect(usersByCategoryQueryBuilder.where).toHaveBeenCalledWith(
+      'skill.categoryId = :categoryId',
+      {
+        categoryId: 'category-id',
+      },
+    );
+    expect(usersByCategoryQueryBuilder.distinct).toHaveBeenCalledWith(true);
+    expect(usersByCategoryQueryBuilder.take).toHaveBeenCalledWith(10);
+    expect(result).toEqual([{ id: 'user-1' }, { id: 'user-2' }]);
+  });
+
+  it('should throw when searching similar users for missing skill', async () => {
+    skillsRepository.findOne.mockResolvedValue(null);
+
+    await expect(service.findSimilarUsers('missing-skill-id')).rejects.toThrow(
+      NotFoundException,
+    );
+    expect(usersRepository.createQueryBuilder).not.toHaveBeenCalled();
   });
 });

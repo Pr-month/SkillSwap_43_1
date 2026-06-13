@@ -13,7 +13,7 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { GetSkillsDto } from './dto/get-skills.dto';
 import { GetSkillsResponseDto } from './dto/get-skills-response.dto';
-import { Category } from 'src/categories/entities/category.entity';
+import { Category } from '../categories/entities/category.entity';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
 
@@ -24,8 +24,22 @@ export class SkillsService {
     private readonly skillsRepository: Repository<Skill>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
     private readonly usersService: UsersService,
   ) {}
+
+  async findById(skillId: string): Promise<Skill> {
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    return skill;
+  }
 
   async create(
     ownerId: string,
@@ -160,6 +174,28 @@ export class SkillsService {
       page,
       totalPages,
     };
+  }
+
+  async findSimilarUsers(skillId: string, limit = 10): Promise<User[]> {
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+      relations: { category: true },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.skills', 'skill')
+      .where('skill.categoryId = :categoryId', {
+        categoryId: skill.category.id,
+      })
+      .distinct(true)
+      .orderBy('user.id', 'ASC')
+      .take(limit)
+      .getMany();
   }
 
   async delete(userId: string, skillId: string): Promise<void> {
