@@ -1,1 +1,1 @@
-export { type PatchCurrentUserDto } from './patchCurrentUser.dto';
+export { PatchCurrentUserDto } from './patchCurrentUser.dto';

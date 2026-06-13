@@ -10,16 +10,26 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { RequestsService } from './requests.service';
+import { ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
-import { Request } from './entities/request.entity';
+import {
+  ApiRequestsChangeStatus,
+  ApiRequestsCreate,
+  ApiRequestsDelete,
+  ApiRequestsGetIncoming,
+  ApiRequestsGetOutgoing,
+} from './docs/requests.swagger';
 import { ChangeRequestStatusDto, CreateRequestDto } from './dto';
+import { Request } from './entities/request.entity';
+import { RequestsService } from './requests.service';
 
+@ApiTags('requests')
 @Controller('requests')
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
+  @ApiRequestsCreate()
   @UseGuards(AccessTokenGuard)
   @Post()
   create(
@@ -29,18 +39,21 @@ export class RequestsController {
     return this.requestsService.create(request.user.id, createRequestDto);
   }
 
+  @ApiRequestsGetIncoming()
   @UseGuards(AccessTokenGuard)
   @Get('incoming')
   getIncoming(@Req() request: AuthenticatedRequest): Promise<Request[]> {
     return this.requestsService.getIncoming(request.user.id);
   }
 
+  @ApiRequestsGetOutgoing()
   @UseGuards(AccessTokenGuard)
   @Get('outgoing')
   getOutgoing(@Req() request: AuthenticatedRequest): Promise<Request[]> {
     return this.requestsService.getOutgoing(request.user.id);
   }
 
+  @ApiRequestsChangeStatus()
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
   changeRequestStatus(
@@ -55,6 +68,7 @@ export class RequestsController {
     );
   }
 
+  @ApiRequestsDelete()
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
   @HttpCode(204)
