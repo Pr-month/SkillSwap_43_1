@@ -7,23 +7,33 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
+import {
+  ApiUsersFindAll,
+  ApiUsersFindMe,
+  ApiUsersPatchMe,
+  ApiUsersUpdatePassword,
+} from './docs/users.swagger';
+import { PatchCurrentUserDto } from './dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
-import { PatchCurrentUserDto } from './dto';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiUsersFindMe()
   @UseGuards(AccessTokenGuard)
   @Get('me')
   findMe(@Req() request: AuthenticatedRequest): Promise<User> {
     return this.usersService.findById(request.user.id);
   }
 
+  @ApiUsersUpdatePassword()
   @UseGuards(AccessTokenGuard)
   @HttpCode(204)
   @Patch('me/password')
@@ -38,11 +48,13 @@ export class UsersController {
     );
   }
 
+  @ApiUsersFindAll()
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
+  @ApiUsersPatchMe()
   @UseGuards(AccessTokenGuard)
   @HttpCode(204)
   @Patch('me')

@@ -1,4 +1,3 @@
-import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import {
   Body,
   Controller,
@@ -12,19 +11,31 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { User } from '../users/entities/user.entity';
+import {
+  ApiSkillsAddToFavorites,
+  ApiSkillsCreate,
+  ApiSkillsDelete,
+  ApiSkillsFindAll,
+  ApiSkillsRemoveFromFavorites,
+  ApiSkillsUpdate,
+} from './docs/skills.swagger';
 import { CreateSkillDto } from './dto/create-skill.dto';
+import { GetSkillsResponseDto } from './dto/get-skills-response.dto';
+import { GetSkillsDto } from './dto/get-skills.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { SkillsService } from './skills.service';
-import { GetSkillsDto } from './dto/get-skills.dto';
-import { GetSkillsResponseDto } from './dto/get-skills-response.dto';
 
+@ApiTags('skills')
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
+  @ApiSkillsCreate()
   @UseGuards(AccessTokenGuard)
   @Post()
   create(
@@ -34,6 +45,7 @@ export class SkillsController {
     return this.skillsService.create(request.user.id, createSkillDto);
   }
 
+  @ApiSkillsUpdate()
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
   update(
@@ -44,6 +56,7 @@ export class SkillsController {
     return this.skillsService.update(request.user.id, skillId, updateSkillDto);
   }
 
+  @ApiSkillsAddToFavorites()
   @UseGuards(AccessTokenGuard)
   @HttpCode(204)
   @Post(':id/favorite')
@@ -54,6 +67,7 @@ export class SkillsController {
     return this.skillsService.addToFavorites(request.user.id, skillId);
   }
 
+  @ApiSkillsRemoveFromFavorites()
   @UseGuards(AccessTokenGuard)
   @HttpCode(204)
   @Delete(':id/favorite')
@@ -64,6 +78,7 @@ export class SkillsController {
     return this.skillsService.removeFromFavorites(request.user.id, skillId);
   }
 
+  @ApiSkillsFindAll()
   @Get()
   findAll(@Query() getSkillsDto: GetSkillsDto): Promise<GetSkillsResponseDto> {
     return this.skillsService.findAll(getSkillsDto);
@@ -74,6 +89,7 @@ export class SkillsController {
     return this.skillsService.findSimilarUsers(skillId, 10);
   }
 
+  @ApiSkillsDelete()
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
   delete(
