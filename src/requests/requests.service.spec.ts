@@ -13,6 +13,7 @@ import { REQUEST_STATUS } from './entities/request.enum';
 import { Role } from '../users/entities/user.enums';
 import { CreateRequestDto } from './dto';
 import { ChangeRequestStatusDto } from './dto';
+import { RequestsGateway } from './requests.gateway';
 
 describe('RequestsService', () => {
   let service: RequestsService;
@@ -33,6 +34,11 @@ describe('RequestsService', () => {
     findById: jest.fn(),
   };
 
+  const requestsGateway = {
+    notifyRequestCreated: jest.fn(),
+    notifyRequestStatusChanged: jest.fn(),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
 
@@ -45,6 +51,7 @@ describe('RequestsService', () => {
         },
         { provide: UsersService, useValue: usersService },
         { provide: SkillsService, useValue: skillsService },
+        { provide: RequestsGateway, useValue: requestsGateway },
       ],
     }).compile();
 
@@ -60,6 +67,7 @@ describe('RequestsService', () => {
 
       expect(requestsRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'request-id' },
+        relations: { sender: true, receiver: true },
       });
       expect(result).toEqual(request);
     });
@@ -165,10 +173,12 @@ describe('RequestsService', () => {
 
   describe('changeRequestStatus', () => {
     const receiver = { id: 'receiver-id' };
+    const sender = { id: 'sender-id' };
     const request = {
       id: 'request-id',
       status: REQUEST_STATUS.PENDING,
       receiver,
+      sender,
     };
     const dto: ChangeRequestStatusDto = { status: REQUEST_STATUS.ACCEPTED };
 

@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service';
 import { SkillsService } from '../skills/skills.service';
 import { ChangeRequestStatusDto, CreateRequestDto } from './dto';
 import { Role } from '../users/entities/user.enums';
+import { RequestsGateway } from './requests.gateway';
 
 @Injectable()
 export class RequestsService {
@@ -19,11 +20,13 @@ export class RequestsService {
     private readonly requestsRepository: Repository<RequestEntity>,
     private readonly usersService: UsersService,
     private readonly skillsService: SkillsService,
+    private readonly requestsGateway: RequestsGateway,
   ) {}
 
   async findById(requestId: string): Promise<RequestEntity> {
     const request = await this.requestsRepository.findOne({
       where: { id: requestId },
+      relations: { sender: true, receiver: true },
     });
 
     if (!request) {
@@ -58,7 +61,14 @@ export class RequestsService {
       offeredSkill,
     });
 
-    return this.requestsRepository.save(request);
+    const savedRequest = await this.requestsRepository.save(request);
+
+    this.requestsGateway.notifyRequestCreated(
+      requestedSkill.owner.id,
+      savedRequest,
+    );
+
+    return savedRequest;
   }
 
   async getIncoming(userId: string): Promise<RequestEntity[]> {
@@ -91,7 +101,14 @@ export class RequestsService {
 
     request.status = changeRequestStatusDto.status;
 
-    return this.requestsRepository.save(request);
+    const updatedRequest = await this.requestsRepository.save(request);
+
+    this.requestsGateway.notifyRequestStatusChanged(
+      request.sender.id,
+      updatedRequest,
+    );
+
+    return updatedRequest;
   }
 
   async deleteRequest(
