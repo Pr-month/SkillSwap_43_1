@@ -9,6 +9,7 @@ describe('UsersController', () => {
     findAll: jest.fn(),
     findById: jest.fn(),
     updatePassword: jest.fn(),
+    patchCurrentUser: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -78,5 +79,28 @@ describe('UsersController', () => {
       'old-password',
       'new-password',
     );
+  });
+
+  it('should patch the current user profile data', async () => {
+    usersService.patchCurrentUser.mockResolvedValue(undefined);
+
+    await expect(
+      controller.patchCurrentUser(
+        {
+          user: {
+            id: 'user-id',
+            payload: { sub: 'user-id' },
+          },
+        } as never,
+        {
+          name: 'Updated Name',
+          city: 'Updated City',
+        },
+      ),
+    ).resolves.toBeUndefined();
+    expect(usersService.patchCurrentUser).toHaveBeenCalledWith('user-id', {
+      name: 'Updated Name',
+      city: 'Updated City',
+    });
   });
 });
