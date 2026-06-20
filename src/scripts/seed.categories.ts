@@ -3,7 +3,9 @@ import { CategoriesData } from './data/seed.categories.data';
 import { Category } from 'src/categories/entities/category.entity';
 
 export async function seedCategories() {
-  await AppDataSource.initialize();
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
+  }
 
   const categoryRepo = AppDataSource.getRepository(Category);
 
@@ -40,12 +42,14 @@ export async function seedCategories() {
   console.log('Сидинг категорий завершен');
 }
 
-seedCategories()
-  .catch((error) => {
-    console.log('Ошибка при сидинге категорий', error);
-  })
-  .finally(() => {
-    if (AppDataSource.isInitialized) {
-      void AppDataSource.destroy();
-    }
-  });
+if (require.main === module) {
+  seedCategories()
+    .catch((error) => {
+      console.log('Ошибка при сидинге категорий', error);
+    })
+    .finally(() => {
+      if (AppDataSource.isInitialized) {
+        void AppDataSource.destroy();
+      }
+    });
+}
