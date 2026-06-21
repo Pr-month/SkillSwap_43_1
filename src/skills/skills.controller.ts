@@ -20,6 +20,7 @@ import {
   ApiSkillsCreate,
   ApiSkillsDelete,
   ApiSkillsFindAll,
+  ApiSkillsFindSimilarUsers,
   ApiSkillsRemoveFromFavorites,
   ApiSkillsUpdate,
 } from './docs/skills.swagger';
@@ -84,6 +85,7 @@ export class SkillsController {
     return this.skillsService.findAll(getSkillsDto);
   }
 
+  @ApiSkillsFindSimilarUsers()
   @Get(':id/similar')
   findSimilarUsers(@Param('id') skillId: string): Promise<User[]> {
     return this.skillsService.findSimilarUsers(skillId, 10);

@@ -9,6 +9,7 @@ import {
 import { CreateSkillDto } from '../dto/create-skill.dto';
 import { GetSkillsResponseDto } from '../dto/get-skills-response.dto';
 import { UpdateSkillDto } from '../dto/update-skill.dto';
+import { User } from '../../users/entities/user.entity';
 
 export function ApiSkillsCreate() {
   return applyDecorators(
@@ -149,6 +150,31 @@ export function ApiSkillsFindAll() {
     ApiResponse({
       status: HttpStatus.NOT_FOUND,
       description: 'Запрашиваемая страница превышает общее количество страниц',
+    }),
+  );
+}
+
+export function ApiSkillsFindSimilarUsers() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Получение пользователей с похожими навыками',
+      description:
+        'Публичный эндпоинт. Возвращает пользователей, у которых есть навыки из той же категории, что и у указанного навыка.',
+    }),
+    ApiParam({
+      name: 'id',
+      description: 'UUID навыка',
+      example: '550e8400-e29b-41d4-a716-446655440000',
+    }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Список похожих пользователей успешно получен',
+      type: User,
+      isArray: true,
+    }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Навык с указанным id не найден',
     }),
   );
 }
