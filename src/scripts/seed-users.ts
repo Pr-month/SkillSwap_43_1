@@ -4,7 +4,7 @@ import { User } from '../users/entities/user.entity';
 import { AppDataSource } from './data-source';
 import { USERS_DATA } from './data/users.data';
 
-async function seedUsers(): Promise<void> {
+export async function seedUsers(): Promise<void> {
   await AppDataSource.initialize();
 
   try {
@@ -37,4 +37,6 @@ async function seedUsers(): Promise<void> {
   }
 }
 
-void seedUsers();
+if (require.main === module) {
+  void seedUsers();
+}

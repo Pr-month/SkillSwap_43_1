@@ -4,8 +4,10 @@ import { User } from '../users/entities/user.entity';
 import { AppDataSource } from './data-source';
 import { ADMIN_DATA } from './data/users.data';
 
-async function seedAdmin(): Promise<void> {
-  await AppDataSource.initialize();
+export async function seedAdmin(): Promise<void> {
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
+  }
 
   try {
     const userRepository = AppDataSource.getRepository(User);
@@ -35,4 +37,6 @@ async function seedAdmin(): Promise<void> {
   }
 }
 
-void seedAdmin();
+if (require.main === module) {
+  void seedAdmin();
+}
