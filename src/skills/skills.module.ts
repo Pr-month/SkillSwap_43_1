@@ -6,10 +6,11 @@ import { Skill } from './entities/skill.entity';
 import { SkillsController } from './skills.controller';
 import { SkillsService } from './skills.service';
 import { Category } from '../categories/entities/category.entity';
+import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Skill, Category]),
+    TypeOrmModule.forFeature([Skill, Category, User]),
     AuthModule,
     UsersModule,
   ],

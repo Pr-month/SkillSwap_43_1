@@ -11,7 +11,9 @@ describe('UsersService', () => {
   const usersRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
+    create: jest.fn(),
     save: jest.fn(),
+    update: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -73,6 +75,42 @@ describe('UsersService', () => {
     );
   });
 
+  it('should find a user by email', async () => {
+    const user = { id: 'user-id', email: 'user@example.com' };
+    usersRepository.findOne.mockResolvedValue(user);
+
+    await expect(service.findByEmail('user@example.com')).resolves.toBe(user);
+    expect(usersRepository.findOne).toHaveBeenCalledWith({
+      where: { email: 'user@example.com' },
+    });
+  });
+
+  it('should create a user', async () => {
+    const createUserData = {
+      name: 'User Name',
+      email: 'user@example.com',
+      password: 'hashed-password',
+      about: 'about',
+      birthdate: new Date('2000-01-01T00:00:00.000Z'),
+      city: 'City',
+      gender: 'male',
+      avatar: '/uploads/avatar.png',
+      skills: ['TypeScript'],
+      wantToLearn: ['NestJS'],
+      favoriteSkills: ['TypeScript'],
+      refreshToken: 'refresh-token',
+    };
+    const createdUser = { id: 'user-id', ...createUserData };
+    usersRepository.create.mockReturnValue(createdUser);
+    usersRepository.save.mockResolvedValue(createdUser);
+
+    await expect(service.createUser(createUserData as never)).resolves.toBe(
+      createdUser,
+    );
+    expect(usersRepository.create).toHaveBeenCalledWith(createUserData);
+    expect(usersRepository.save).toHaveBeenCalledWith(createdUser);
+  });
+
   it('should update a user password', async () => {
     const user = {
       id: 'user-id',
@@ -104,5 +142,39 @@ describe('UsersService', () => {
       service.updatePassword('user-id', 'wrong-password', 'new-password'),
     ).rejects.toBeInstanceOf(UnauthorizedException);
     expect(usersRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should update a user refresh token', async () => {
+    usersRepository.update.mockResolvedValue(undefined);
+
+    await expect(
+      service.updateRefreshToken('user-id', 'new-refresh-token'),
+    ).resolves.toBeUndefined();
+    expect(usersRepository.update).toHaveBeenCalledWith('user-id', {
+      refreshToken: 'new-refresh-token',
+    });
+  });
+
+  it('should patch current user data', async () => {
+    const user = {
+      id: 'user-id',
+      name: 'Old Name',
+      city: 'Old City',
+    };
+    const patchData = {
+      name: 'New Name',
+      city: 'New City',
+    };
+    const patchedUser = { ...user, ...patchData };
+    usersRepository.findOne.mockResolvedValue(user);
+    usersRepository.save.mockResolvedValue(patchedUser);
+
+    await expect(
+      service.patchCurrentUser('user-id', patchData as never),
+    ).resolves.toBeUndefined();
+    expect(usersRepository.findOne).toHaveBeenCalledWith({
+      where: { id: 'user-id' },
+    });
+    expect(usersRepository.save).toHaveBeenCalledWith(patchedUser);
   });
 });

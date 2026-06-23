@@ -76,4 +76,35 @@ export class AuthService {
       refreshToken,
     };
   }
+
+  async refreshTokens(
+    userId: string,
+    currentRefreshToken: string,
+  ): Promise<TAuthTokens> {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    if (user.refreshToken !== currentRefreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const payload: TJwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const accessToken = await this.jwtTokenService.signAccessToken(payload);
+    const refreshToken = await this.jwtTokenService.signRefreshToken(payload);
+
+    await this.usersService.updateRefreshToken(user.id, refreshToken);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
 }

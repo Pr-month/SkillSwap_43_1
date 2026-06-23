@@ -1,5 +1,8 @@
 import { registerAs } from '@nestjs/config';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 type DatabaseType = 'postgres' | 'mongodb';
 
@@ -19,3 +22,5 @@ const dbConfig = registerAs(
 
 export default dbConfig;
 export type TDbConfig = ReturnType<typeof dbConfig>;
+
+export const AppDataSource = new DataSource(dbConfig());

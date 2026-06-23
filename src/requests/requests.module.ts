@@ -6,6 +6,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { SkillsModule } from '../skills/skills.module';
 import { Request as RequestEntity } from './entities/request.entity';
+import { RequestsGateway } from './requests.gateway';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { Request as RequestEntity } from './entities/request.entity';
     SkillsModule,
   ],
   controllers: [RequestsController],
-  providers: [RequestsService],
+  providers: [RequestsService, RequestsGateway],
 })
 export class RequestsModule {}

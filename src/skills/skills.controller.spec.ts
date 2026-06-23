@@ -11,6 +11,7 @@ describe('SkillsController', () => {
     update: jest.fn(),
     addToFavorites: jest.fn(),
     removeFromFavorites: jest.fn(),
+    findSimilarUsers: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -85,5 +86,16 @@ describe('SkillsController', () => {
       'user-id',
       'skill-id',
     );
+  });
+
+  it('should return similar users by skill id', async () => {
+    const skillId = 'skill-id';
+    const users = [{ id: 'user-1' }, { id: 'user-2' }];
+    skillsService.findSimilarUsers.mockResolvedValue(users);
+
+    const result = await controller.findSimilarUsers(skillId);
+
+    expect(skillsService.findSimilarUsers).toHaveBeenCalledWith('skill-id', 10);
+    expect(result).toBe(users);
   });
 });
