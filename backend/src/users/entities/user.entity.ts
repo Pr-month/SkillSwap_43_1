@@ -5,12 +5,15 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Role, Gender } from './user.enums';
+import { City } from '../../cities/entities/city.entity';
 import { Skill } from '../../skills/entities/skill.entity';
 import { Request } from '../../requests/entities/request.entity';
 
@@ -39,8 +42,9 @@ export class User {
   })
   birthdate: Date;
 
-  @Column()
-  city: string;
+  @ManyToOne(() => City, (city) => city.users)
+  @JoinColumn({ name: 'city_id' })
+  city: City;
 
   @Column({
     type: 'enum',

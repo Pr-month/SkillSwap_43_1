@@ -22,6 +22,7 @@
     "seed:admin:e2e": "dotenv -e .env.test.local -- ts-node -r tsconfig-paths/register src/scripts/seed-admin.ts",
     "seed:users:e2e": "dotenv -e .env.test.local -- ts-node -r tsconfig-paths/register src/scripts/seed-users.ts",
     "seed:skills": "ts-node -r tsconfig-paths/register src/scripts/seed.skills.ts",
+    "seed:cities": "ts-node -r tsconfig-paths/register src/scripts/seed-cities.ts",
     "seed:categories": "ts-node -r tsconfig-paths/register src/scripts/seed.categories.ts",
     "seed:admin": "ts-node -r tsconfig-paths/register src/scripts/seed-admin.ts",
     "seed:users": "ts-node -r tsconfig-paths/register src/scripts/seed-users.ts"

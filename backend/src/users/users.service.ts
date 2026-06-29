@@ -9,6 +9,7 @@ import { DeepPartial, Repository } from 'typeorm';
 import { Gender } from './entities/user.enums';
 import { User } from './entities/user.entity';
 import { PatchCurrentUserDto } from './dto';
+import { City } from '../cities/entities/city.entity';
 
 type TCreateUserData = {
   name: string;
@@ -16,7 +17,7 @@ type TCreateUserData = {
   password: string;
   about: string;
   birthdate: Date;
-  city: string;
+  city: City;
   gender: Gender;
   avatar: string;
   skills: string[];

@@ -64,7 +64,7 @@ describe('Categories (e2e)', () => {
       password: 'TestPassword1234',
       about: 'Тестовое описание',
       birthdate: new Date('2000-06-20'),
-      city: 'Тестовый город',
+      city: 'Москва',
       gender: Gender.MALE,
       avatar: 'link',
       skills: [],

@@ -10,12 +10,14 @@ import { JwtModule } from '../jwt/jwt.module';
 import { UsersModule } from '../users/users.module';
 import { RolesGuard } from './guards/role.guard';
 import { WsJwtGuard } from './guards/wsJwt.guard';
+import { CitiesModule } from '../cities/cities.module';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'access-token' }),
     JwtModule,
     UsersModule,
+    CitiesModule,
   ],
   controllers: [AuthController],
   providers: [
