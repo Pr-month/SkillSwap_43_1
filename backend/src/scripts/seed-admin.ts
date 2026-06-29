@@ -3,6 +3,8 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 import { AppDataSource } from './data-source';
 import { ADMIN_DATA } from './data/users.data';
+import { City } from '../cities/entities/city.entity';
+import { fillDatabaseCities } from './seed-cities';
 
 export async function seedAdmin(): Promise<void> {
   if (!AppDataSource.isInitialized) {
@@ -11,6 +13,7 @@ export async function seedAdmin(): Promise<void> {
 
   try {
     const userRepository = AppDataSource.getRepository(User);
+    const cityRepository = AppDataSource.getRepository(City);
 
     const count = await userRepository.count({
       where: { email: ADMIN_DATA.email },
@@ -20,6 +23,12 @@ export async function seedAdmin(): Promise<void> {
       console.log('Admin already exists, skipping...');
       return;
     }
+
+    await fillDatabaseCities();
+    const exampleCity = await cityRepository.findOne({
+      where: { name: 'Москва' },
+    });
+    ADMIN_DATA.city = exampleCity as City;
 
     const hashedPassword = await bcrypt.hash(ADMIN_DATA.password, 10);
 
