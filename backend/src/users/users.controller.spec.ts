@@ -94,13 +94,13 @@ describe('UsersController', () => {
         } as never,
         {
           name: 'Updated Name',
-          city: 'Updated City',
+          cityId: 'updated-city-id',
         },
       ),
     ).resolves.toBeUndefined();
     expect(usersService.patchCurrentUser).toHaveBeenCalledWith('user-id', {
       name: 'Updated Name',
-      city: 'Updated City',
+      cityId: 'updated-city-id',
     });
   });
 });

@@ -26,7 +26,7 @@ export class AuthService {
     const temporaryRefreshToken =
       await this.jwtTokenService.signRefreshToken(payloadWithoutId);
 
-    const reqCity = await this.citiesService.findByName(registerDto.city);
+    const reqCity = await this.citiesService.findById(registerDto.cityId);
 
     const user = await this.usersService.createUser({
       ...registerDto,

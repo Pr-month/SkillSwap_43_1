@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEmail, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { Gender } from '../entities/user.enums';
 
 export class PatchCurrentUserDto {
@@ -40,12 +40,12 @@ export class PatchCurrentUserDto {
   birthdate?: Date;
 
   @ApiPropertyOptional({
-    description: 'Город проживания',
-    example: 'Москва',
+    description: 'UUID города проживания',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsOptional()
-  @IsString()
-  city?: string;
+  @IsUUID()
+  cityId?: string;
 
   @ApiPropertyOptional({
     description: 'Пол пользователя',

@@ -10,6 +10,7 @@ import { Gender } from './entities/user.enums';
 import { User } from './entities/user.entity';
 import { PatchCurrentUserDto } from './dto';
 import { City } from '../cities/entities/city.entity';
+import { CitiesService } from '../cities/cities.service';
 
 type TCreateUserData = {
   name: string;
@@ -31,6 +32,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly citiesService: CitiesService,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -93,7 +95,11 @@ export class UsersService {
 
   async patchCurrentUser(id: string, data: PatchCurrentUserDto): Promise<void> {
     const user = await this.findById(id);
-    Object.assign(user, data);
+    const { cityId, ...rest } = data;
+    Object.assign(user, rest);
+    if (cityId) {
+      user.city = await this.citiesService.findById(cityId);
+    }
     await this.usersRepository.save(user);
   }
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsDate, IsEmail, IsEnum, IsString } from 'class-validator';
+import { IsArray, IsDate, IsEmail, IsEnum, IsString, IsUUID } from 'class-validator';
 import { Gender } from 'src/users/entities/user.enums';
 
 export class RegisterDto {
@@ -43,11 +43,11 @@ export class RegisterDto {
   birthdate!: Date;
 
   @ApiProperty({
-    description: 'Город проживания',
-    example: 'Москва',
+    description: 'UUID города проживания',
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @IsString()
-  city!: string;
+  @IsUUID()
+  cityId!: string;
 
   @ApiProperty({
     description: 'Пол пользователя',
