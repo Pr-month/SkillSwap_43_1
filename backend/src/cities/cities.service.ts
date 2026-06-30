@@ -56,7 +56,7 @@ export class CitiesService {
     return city;
   }
 
-  async findByName(name: string): Promise<City | null> {
+  async findByName(name: string): Promise<City> {
     const reqCity = await this.cityRepository.findOne({
       where: { name },
     });

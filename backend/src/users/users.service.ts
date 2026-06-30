@@ -95,10 +95,10 @@ export class UsersService {
 
   async patchCurrentUser(id: string, data: PatchCurrentUserDto): Promise<void> {
     const user = await this.findById(id);
-    const { cityId, ...rest } = data;
+    const { city, ...rest } = data;
     Object.assign(user, rest);
-    if (cityId) {
-      user.city = await this.citiesService.findById(cityId);
+    if (city) {
+      user.city = await this.citiesService.findByName(city);
     }
     await this.usersRepository.save(user);
   }

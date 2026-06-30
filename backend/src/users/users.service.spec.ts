@@ -17,7 +17,7 @@ describe('UsersService', () => {
     update: jest.fn(),
   };
   const citiesService = {
-    findById: jest.fn(),
+    findByName: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -172,11 +172,11 @@ describe('UsersService', () => {
     };
     const patchData = {
       name: 'New Name',
-      cityId: 'city-id',
+      city: 'New City',
     };
     const patchedUser = { ...user, name: 'New Name', city: cityEntity };
     usersRepository.findOne.mockResolvedValue(user);
-    citiesService.findById.mockResolvedValue(cityEntity);
+    citiesService.findByName.mockResolvedValue(cityEntity);
     usersRepository.save.mockResolvedValue(patchedUser);
 
     await expect(
@@ -185,7 +185,7 @@ describe('UsersService', () => {
     expect(usersRepository.findOne).toHaveBeenCalledWith({
       where: { id: 'user-id' },
     });
-    expect(citiesService.findById).toHaveBeenCalledWith('city-id');
+    expect(citiesService.findByName).toHaveBeenCalledWith('New City');
     expect(usersRepository.save).toHaveBeenCalledWith(patchedUser);
   });
 });
