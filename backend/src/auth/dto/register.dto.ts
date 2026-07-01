@@ -43,7 +43,7 @@ export class RegisterDto {
   birthdate!: Date;
 
   @ApiProperty({
-    description: 'Город проживания',
+    description: 'Название города проживания',
     example: 'Москва',
   })
   @IsString()

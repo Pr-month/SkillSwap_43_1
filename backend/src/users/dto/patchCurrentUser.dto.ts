@@ -40,7 +40,7 @@ export class PatchCurrentUserDto {
   birthdate?: Date;
 
   @ApiPropertyOptional({
-    description: 'Город проживания',
+    description: 'Название города проживания',
     example: 'Москва',
   })
   @IsOptional()

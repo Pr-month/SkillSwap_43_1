@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { instanceToPlain } from 'class-transformer';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
+import { CitiesService } from '../cities/cities.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -15,6 +16,9 @@ describe('UsersService', () => {
     save: jest.fn(),
     update: jest.fn(),
   };
+  const citiesService = {
+    findByName: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,6 +27,10 @@ describe('UsersService', () => {
         {
           provide: getRepositoryToken(User),
           useValue: usersRepository,
+        },
+        {
+          provide: CitiesService,
+          useValue: citiesService,
         },
       ],
     }).compile();
@@ -156,17 +164,19 @@ describe('UsersService', () => {
   });
 
   it('should patch current user data', async () => {
+    const cityEntity = { id: 'city-id', name: 'New City' };
     const user = {
       id: 'user-id',
       name: 'Old Name',
-      city: 'Old City',
+      city: { id: 'old-city-id', name: 'Old City' },
     };
     const patchData = {
       name: 'New Name',
       city: 'New City',
     };
-    const patchedUser = { ...user, ...patchData };
+    const patchedUser = { ...user, name: 'New Name', city: cityEntity };
     usersRepository.findOne.mockResolvedValue(user);
+    citiesService.findByName.mockResolvedValue(cityEntity);
     usersRepository.save.mockResolvedValue(patchedUser);
 
     await expect(
@@ -175,6 +185,7 @@ describe('UsersService', () => {
     expect(usersRepository.findOne).toHaveBeenCalledWith({
       where: { id: 'user-id' },
     });
+    expect(citiesService.findByName).toHaveBeenCalledWith('New City');
     expect(usersRepository.save).toHaveBeenCalledWith(patchedUser);
   });
 });

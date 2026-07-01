@@ -32,7 +32,7 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
       refreshToken: temporaryRefreshToken,
-      city: reqCity as City,
+      city: reqCity,
     });
 
     const payload: TJwtPayload = {
