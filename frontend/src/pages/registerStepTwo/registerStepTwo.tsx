@@ -258,17 +258,18 @@ export const RegisterStepTwo: FC = () => {
           control={control}
           render={({ field }) => (
             <MultiSelect
-              {...field}
+              // Убираем {...field} и передаём явно
+              value={field.value || []}
+              onChange={value => {
+                field.onChange(value);
+                trigger('categories');
+              }}
+              onBlur={field.onBlur}
               className={styles.elementFull}
               options={skills}
               title="Категория навыка, которому хотите научиться"
               id="skill"
               placeholder="Выберите категорию"
-              value={field.value}
-              onChange={value => {
-                field.onChange(value);
-                trigger('categories');
-              }}
               error={errors.categories?.message}
               onFocus={() => clearErrors('categories')}
             />
@@ -279,17 +280,18 @@ export const RegisterStepTwo: FC = () => {
           control={control}
           render={({ field }) => (
             <MultiSelect
-              {...field}
+              // Убираем {...field} и передаём явно
+              value={field.value || []}
+              onChange={value => {
+                field.onChange(value);
+                trigger('subcategories');
+              }}
+              onBlur={field.onBlur}
               className={styles.elementFull}
               options={subcategoryOptions}
               title="Подкатегория навыка, которому хотите научиться"
               id="subSkill"
               placeholder="Выберите подкатегорию"
-              value={field.value}
-              onChange={value => {
-                field.onChange(value);
-                trigger('subcategories');
-              }}
               error={errors.subcategories?.message}
               onFocus={() => {
                 if (subcategoryOptions.length === 0) {
