@@ -1,35 +1,55 @@
 import { Skill } from '@/entities/skill/model/types';
 import { User } from '@/entities/user/model/types';
-import { TServerResponse } from '@/shared/utils/api';
+import { BackendUser, mapBackendUser, TServerResponse } from '@/shared/utils/api';
 import { getCookie } from '@/shared/utils/cookies';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';  
+const API_BASE_URL = import.meta.env.VITE_SKILLSWAP_API_URL || '';
 const URL = API_BASE_URL ? `${API_BASE_URL}` : '';
-
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then(err => Promise.reject(err));
 
-const assertSuccess = <T>(response: { success: boolean; data: T }, errorText: string) => {
-  if (!response.success) throw new Error(errorText);
-  return response.data;
+type BackendCategory = {
+  id: string;
+  name: string;
+  parent?: BackendCategory | null;
 };
 
-type SkillResponse = ServerResponse<Skill[]>;
+type BackendSkill = {
+  id: string;
+  title: string;
+  description: string;
+  images?: string[];
+  category: BackendCategory;
+};
 
-type UsersResponse = ServerResponse<User[]>;
-type AuthResponse = ServerResponse<{ accessToken: string; refreshToken: string }>;
+type SkillsResponse = {
+  data: BackendSkill[];
+  page: number;
+  totalPages: number;
+};
+
+type AuthResponse = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+const mapBackendSkill = (skill: BackendSkill): Skill => ({
+  category: (skill.category.parent?.name || skill.category.name) as Skill['category'],
+  subcategory: skill.category.name as Skill['subcategory'],
+  subcategoryId: skill.category.id,
+});
 
 export const getSkillsApi = async () => {
-  const res = await fetch(`/api/skills`);
-  const checkedRes = await checkResponse<SkillResponse>(res);
-  return assertSuccess(checkedRes, 'Не удалось получить навыки');
+  const res = await fetch(`${URL}/api/skills`);
+  const checkedRes = await checkResponse<SkillsResponse>(res);
+  return checkedRes.data.map(mapBackendSkill);
 };
 
 export const getUsersApi = async () => {
-  const res = await fetch(`/api/users/all`);
-  const checkedRes = await checkResponse<UsersResponse>(res);
-  return assertSuccess(checkedRes, 'Не удалось получить данные о пользователях');
+  const res = await fetch(`${URL}/api/users`);
+  const users = await checkResponse<BackendUser[]>(res);
+  return users.map(mapBackendUser);
 };
 
 export type LoginData = {
@@ -38,22 +58,20 @@ export type LoginData = {
 };
 
 export const loginUserApi = async (data: LoginData) => {
-  const res = await fetch(`/api/login`, {
+  const res = await fetch(`${URL}/api/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
     },
     body: JSON.stringify(data),
   });
-  const checkedRes = await checkResponse<AuthResponse>(res);
-  return assertSuccess(checkedRes, 'Не удалось залогиниться');
+  return checkResponse<AuthResponse>(res);
 };
 
-// Добавляем тип для обновления профиля
 export type TUpdateProfileData = {
   name: string;
   birthdate: string;
-  gender: 'Мужской' | 'Женский';
+  gender: 'male' | 'female';
   city: string;
   description: string;
   avatar?: string;
@@ -63,16 +81,28 @@ export type TUpdateProfileResponse = TServerResponse<{
   user: User;
 }>;
 
-// Добавляем метод для обновления профиля
 export const updateProfileApi = (data: TUpdateProfileData): Promise<TUpdateProfileResponse> => {
-  return fetch(`${URL}/api/profile`, {
+  return fetch(`${URL}/api/users/me`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken') || '',
+      authorization: `Bearer ${getCookie('accessToken') || ''}`,
     },
-    body: JSON.stringify(data),
-  }).then(res => checkResponse<TUpdateProfileResponse>(res));
+    body: JSON.stringify({
+      name: data.name,
+      birthdate: data.birthdate,
+      gender: data.gender,
+      city: data.city,
+      about: data.description,
+      avatar: data.avatar,
+    }),
+  }).then(async res => {
+    if (res.status === 204) {
+      return { success: true, user: {} as User };
+    }
+
+    return checkResponse<TUpdateProfileResponse>(res);
+  });
 };
 
 export type ServerResponse<T> = {

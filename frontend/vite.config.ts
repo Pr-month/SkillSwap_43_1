@@ -40,9 +40,8 @@ export default defineConfig(({ command }) => {
       port: 8080,
       proxy: {
         '/api': {
-          target: 'http://host.docker.internal:3000',
+          target: process.env.VITE_SKILLSWAP_API_URL || 'http://localhost:3000',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')  // Убирает /api префикс
         }
       }
     },

@@ -220,7 +220,7 @@ export function ProfileForm() {
       const response = await updateProfileApi({
         name: formData.name,
         birthdate: new Date(formData.birthDate).toISOString(),
-        gender,
+        gender: formData.gender,
         city: formData.city,
         description: formData.about,
       });
