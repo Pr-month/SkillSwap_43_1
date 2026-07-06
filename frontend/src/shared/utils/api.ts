@@ -75,14 +75,14 @@ const mapSkill = (skill?: BackendSkill): CustomSkill => {
   const category = skill?.category;
 
   return {
-    category: (category?.parent?.name || category?.name || '') as CustomSkill['category'],
-    subcategory: (category?.name || '') as CustomSkill['subcategory'],
+    category: category?.parent?.name || category?.name || '',
+    subcategory: category?.name || '',
     subcategoryId: category?.id || skill?.id || '',
     name: skill?.title || '',
     image: skill?.images || [],
     description: skill?.description || '',
     customSkillId: skill?.id || '',
-  };
+  } as CustomSkill;
 };
 
 export const mapBackendUser = (user: BackendUser): User => ({

@@ -34,11 +34,12 @@ type AuthResponse = {
   refreshToken: string;
 };
 
-const mapBackendSkill = (skill: BackendSkill): Skill => ({
-  category: (skill.category.parent?.name || skill.category.name) as Skill['category'],
-  subcategory: skill.category.name as Skill['subcategory'],
-  subcategoryId: skill.category.id,
-});
+const mapBackendSkill = (skill: BackendSkill): Skill =>
+  ({
+    category: skill.category.parent?.name || skill.category.name,
+    subcategory: skill.category.name,
+    subcategoryId: skill.category.id,
+  }) as Skill;
 
 export const getSkillsApi = async () => {
   const res = await fetch(`${URL}/api/skills`);
