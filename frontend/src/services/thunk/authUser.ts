@@ -10,6 +10,17 @@ import {
 } from '@/shared/utils/api';
 import { deleteCookie, setCookie } from '@/shared/utils/cookies';
 
+// Вспомогательная функция для обработки ошибок
+const getErrorMessage = (error: unknown): string => {
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String(error.message);
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Произошла неизвестная ошибка';
+};
+
 export const fetchUser = createAsyncThunk<TUserResponse, void>(
   `${AUTH_USER_SLICE}/fetchUser`,
   async (_, { rejectWithValue }) => {
@@ -17,7 +28,7 @@ export const fetchUser = createAsyncThunk<TUserResponse, void>(
       const data = await getUserApi();
       return data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(getErrorMessage(error));
     }
   },
 );
@@ -31,7 +42,7 @@ export const loginUser = createAsyncThunk<TAuthResponse, TLoginData>(
       localStorage.setItem('refreshToken', data.refreshToken);
       return data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(getErrorMessage(error));
     }
   },
 );
@@ -42,9 +53,10 @@ export const logoutUserApi = createAsyncThunk(
     try {
       const data = await logoutApi();
       deleteCookie('accessToken');
+      localStorage.removeItem('refreshToken'); // ← Добавьте для очистки
       return data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(getErrorMessage(error));
     }
   },
 );
