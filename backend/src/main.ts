@@ -9,6 +9,14 @@ import { AllExceptionFilter } from './common/filters/all-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const config: TAppConfig = app.get(appConfig.KEY);
+
+  app.enableCors({
+    origin: config.corsOrigin,
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'authorization'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
   app.setGlobalPrefix('api');
   app.useStaticAssets(join(process.cwd(), 'public'));
   app.useGlobalPipes(
@@ -29,7 +37,6 @@ async function bootstrap() {
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, swaggerDocument);
 
-  const config: TAppConfig = app.get(appConfig.KEY);
   await app.listen(config.port);
 }
 
