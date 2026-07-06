@@ -16,12 +16,14 @@ services:
       DATABASE_USERNAME: db
       DATABASE_PASSWORD: postgres
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - backend_uploads:/app/public/uploads
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - skillswap-network
 
   db:
     image: postgres:17-alpine
@@ -32,15 +34,21 @@ services:
       POSTGRES_USER: db
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U db -d db"]
+      test: ['CMD-SHELL', 'pg_isready -U db -d db']
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - skillswap-network
 
 volumes:
   backend_uploads:
   postgres_data:
+
+networks:
+  skillswap-network:
+    driver: bridge
