@@ -36,12 +36,39 @@ export class UsersService {
   ) {}
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    return this.usersRepository.find({
+      relations: {
+        city: true,
+        skills: {
+          category: {
+            parent: true,
+          },
+        },
+        wantToLearn: {
+          category: {
+            parent: true,
+          },
+        },
+      },
+    });
   }
 
   async findById(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
+      relations: {
+        city: true,
+        skills: {
+          category: {
+            parent: true,
+          },
+        },
+        wantToLearn: {
+          category: {
+            parent: true,
+          },
+        },
+      },
     });
 
     if (!user) {

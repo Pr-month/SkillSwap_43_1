@@ -45,6 +45,21 @@ services:
     networks:
       - skillswap-network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: skillswap-frontend
+    restart: unless-stopped
+    ports:
+      - '8080:8080' # хост:контейнер
+    environment:
+      - VITE_SKILLSWAP_API_URL=http://localhost:3000
+    networks:
+      - skillswap-network
+    depends_on:
+      - backend
+
 volumes:
   backend_uploads:
   postgres_data:
