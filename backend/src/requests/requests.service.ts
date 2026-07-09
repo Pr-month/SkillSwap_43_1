@@ -11,7 +11,9 @@ import { UsersService } from '../users/users.service';
 import { SkillsService } from '../skills/skills.service';
 import { ChangeRequestStatusDto, CreateRequestDto } from './dto';
 import { Role } from '../users/entities/user.enums';
+import { REQUEST_STATUS } from './entities/request.enum';
 import { RequestsGateway } from './requests.gateway';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class RequestsService {
@@ -21,6 +23,7 @@ export class RequestsService {
     private readonly usersService: UsersService,
     private readonly skillsService: SkillsService,
     private readonly requestsGateway: RequestsGateway,
+    private readonly mailService: MailService,
   ) {}
 
   async findById(requestId: string): Promise<RequestEntity> {
@@ -68,6 +71,11 @@ export class RequestsService {
       savedRequest,
     );
 
+    void this.mailService.sendUserNotification(requestedSkill.owner.email, {
+      subject: 'Новая заявка на обмен навыками — SkillSwap',
+      text: `Вам поступила новая заявка на обмен навыками от пользователя ${sender.name}.`,
+    });
+
     return savedRequest;
   }
 
@@ -107,6 +115,11 @@ export class RequestsService {
       request.sender.id,
       updatedRequest,
     );
+
+    void this.mailService.sendUserNotification(request.sender.email, {
+      subject: 'Статус вашей заявки изменился — SkillSwap',
+      text: `Ваша заявка на обмен навыками была ${changeRequestStatusDto.status === REQUEST_STATUS.ACCEPTED ? 'принята' : 'отклонена'}.`,
+    });
 
     return updatedRequest;
   }
