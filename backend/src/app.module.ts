@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import appConfig from './config/app.config';
 import { jwtConfig } from './config/jwt.config';
+import { mailerConfig } from './config/mailer.config';
+import { MailModule } from './mail/mail.module';
 import { SkillsModule } from './skills/skills.module';
 import { CategoriesModule } from './categories/categories.module';
 import { FilesModule } from './files/files.module';
@@ -18,7 +20,7 @@ import { CitiesModule } from './cities/cities.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, appConfig, jwtConfig],
+      load: [databaseConfig, appConfig, jwtConfig, mailerConfig],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -32,6 +34,7 @@ import { CitiesModule } from './cities/cities.module';
     FilesModule,
     RequestsModule,
     CitiesModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

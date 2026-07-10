@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { SkillsModule } from '../skills/skills.module';
 import { Request as RequestEntity } from './entities/request.entity';
 import { RequestsGateway } from './requests.gateway';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { RequestsGateway } from './requests.gateway';
     AuthModule,
     UsersModule,
     SkillsModule,
+    MailModule,
   ],
   controllers: [RequestsController],
   providers: [RequestsService, RequestsGateway],
