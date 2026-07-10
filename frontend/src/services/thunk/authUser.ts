@@ -1,0 +1,62 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { AUTH_USER_SLICE } from '../slices/slicesName';
+import {
+  getUserApi,
+  loginUserApi,
+  logoutApi,
+  TAuthResponse,
+  TLoginData,
+  TUserResponse,
+} from '@/shared/utils/api';
+import { deleteCookie, setCookie } from '@/shared/utils/cookies';
+
+// Вспомогательная функция для обработки ошибок
+const getErrorMessage = (error: unknown): string => {
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String(error.message);
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Произошла неизвестная ошибка';
+};
+
+export const fetchUser = createAsyncThunk<TUserResponse, void>(
+  `${AUTH_USER_SLICE}/fetchUser`,
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await getUserApi();
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const loginUser = createAsyncThunk<TAuthResponse, TLoginData>(
+  `${AUTH_USER_SLICE}/loginUser`,
+  async (dataUser, { rejectWithValue }) => {
+    try {
+      const data = await loginUserApi(dataUser);
+      setCookie('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const logoutUserApi = createAsyncThunk(
+  `${AUTH_USER_SLICE}/logoutUserApi`,
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await logoutApi();
+      deleteCookie('accessToken');
+      localStorage.removeItem('refreshToken'); // ← Добавьте для очистки
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
